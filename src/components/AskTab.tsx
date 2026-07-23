@@ -48,6 +48,7 @@ export default function AskTab({
   const [composerValue, setComposerValue] = useState("");
   const [showWhy, setShowWhy] = useState(false);
   const [localStage, setLocalStage] = useState<LocalStage>(settled ? "done" : "waiting");
+  const [responseMode, setResponseMode] = useState<"medical" | "community">("medical");
 
   // A newly-asked question always starts unsettled; reset the reveal animation
   // synchronously during render (React's documented pattern for "reset state
@@ -57,10 +58,11 @@ export default function AskTab({
     setTrackedQuestion(question);
     setLocalStage(settled ? "done" : "waiting");
     setShowWhy(false);
+    setResponseMode("medical");
   }
 
   useEffect(() => {
-    if (settled || !question || !topic) return;
+    if (settled || !question || !topic || responseMode !== "medical") return;
     const response = AI_RESPONSE_BY_TOPIC[topic];
     if (!response.hasRiskyReply) {
       const t = setTimeout(() => {
@@ -80,24 +82,25 @@ export default function AskTab({
     ];
     return () => timers.forEach(clearTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [question, topic, settled]);
+  }, [question, topic, settled, responseMode]);
 
   const response = topic ? AI_RESPONSE_BY_TOPIC[topic] : null;
-  const isDone = localStage === "done";
-  const showSafeReply = localStage !== "waiting";
-  const showRiskyWrap = localStage === "riskyReplyShown" || localStage === "scanning";
-  const isScanning = localStage === "scanning";
-  const isFlagged = response?.hasRiskyReply && isDone;
+  const isMedicalMode = responseMode === "medical";
+  const isCommunityMode = responseMode === "community";
+  const isDone = isCommunityMode ? true : localStage === "done";
+  const showSafeReply = isMedicalMode && localStage !== "waiting";
+  const showRiskyWrap = isMedicalMode && (localStage === "riskyReplyShown" || localStage === "scanning");
+  const isScanning = isMedicalMode && localStage === "scanning";
+  const isFlagged = isMedicalMode && response?.hasRiskyReply && isDone;
 
   const chooseSatisfaction = (choice: Satisfaction) => {
     onSatisfactionChange(choice);
-    if (choice === "no") onConnectClinician("chat");
   };
 
   return (
-    <section className="app-view" id="screen-ask" data-testid="screen-ask" tabIndex={-1} aria-label="Ask Kin AI">
+    <section className="app-view" id="screen-ask" data-testid="screen-ask" tabIndex={-1} aria-label="Ask Kin">
       <TopBar
-        heading="Ask Kin AI"
+        heading="Ask Kin"
         subtitle="Expert parenting advice powered by science and community wisdom."
         onOpenMenu={onOpenMenu}
         onOpenNotifications={onOpenNotifications}
@@ -123,27 +126,40 @@ export default function AskTab({
               {question}
             </p>
 
-            <div className="card response-card" data-testid="ai-response-card">
+            <div className="card response-card" data-testid={isMedicalMode ? "ai-response-card" : "community-response-card"}>
               <div className="tag-row">
-                <span className="pill-tag primary">Professional Source</span>
-                <span className="pill-tag tertiary">Community Wisdom</span>
+                <span className={`pill-tag ${isMedicalMode ? "primary" : "secondary"}`}>{isMedicalMode ? "Medical response" : "Community response"}</span>
+                <span className={`pill-tag ${isMedicalMode ? "tertiary" : "primary"}`}>{isMedicalMode ? "Professional Source" : "Shared experience"}</span>
               </div>
               <p>{response.intro}</p>
-              <ul>
-                {response.bullets.map((b) => (
-                  <li key={b}>{b}</li>
-                ))}
-              </ul>
-              <p className="followup-note">{response.followUpNote}</p>
+              {isMedicalMode && (
+                <ul>
+                  {response.bullets.map((b) => (
+                    <li key={b}>{b}</li>
+                  ))}
+                </ul>
+              )}
+              {isMedicalMode ? <p className="followup-note">{response.followUpNote}</p> : <p className="followup-note">This answer is framed around lived experience and practical support you can try right away.</p>}
+              <div className="intervention-actions" style={{ marginTop: 12 }}>
+                {isMedicalMode ? (
+                  <button type="button" className="btn btn-ghost btn-sm" data-testid="switch-to-community" onClick={() => setResponseMode("community")}>
+                    Try the community response instead
+                  </button>
+                ) : (
+                  <button type="button" className="btn btn-ghost btn-sm" data-testid="switch-to-medical" onClick={() => setResponseMode("medical")}>
+                    Try the medical response instead
+                  </button>
+                )}
+              </div>
             </div>
 
-            {!showSafeReply && !isFlagged && (
+            {isMedicalMode && !showSafeReply && !isFlagged && (
               <p className="typing-note" data-testid="typing-note">
                 Community is replying…
               </p>
             )}
 
-            {showSafeReply && !response.hasRiskyReply && response.communityQuote && (
+            {isCommunityMode && response.communityQuote && (
               <div className="card" data-testid="community-quote-card">
                 <span className="field-label">From the Community</span>
                 <p className="community-quote">&ldquo;{response.communityQuote.text}&rdquo;</p>
@@ -161,7 +177,7 @@ export default function AskTab({
               </div>
             )}
 
-            {response.hasRiskyReply && (
+            {isMedicalMode && response.hasRiskyReply && (
               <div className="card" data-testid="community-thread-card">
                 <span className="field-label">From the Community</span>
                 {showSafeReply && (
@@ -330,6 +346,21 @@ export default function AskTab({
                     👎 No
                   </button>
                 </div>
+
+                {satisfaction === "no" && (
+                  <div className="card" data-testid="professional-prompt" style={{ marginTop: 12 }}>
+                    <span className="field-label">Ask a professional</span>
+                    <p>Need a second opinion? Talk to a clinician now.</p>
+                    <div className="intervention-actions">
+                      <button type="button" className="btn btn-primary btn-sm" data-testid="talk-to-professional" onClick={() => onConnectClinician("chat")}>
+                        Talk to a clinician now
+                      </button>
+                      <button type="button" className="btn btn-ghost btn-sm" data-testid="video-professional" onClick={() => onConnectClinician("video")}>
+                        Start a video call
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {satisfaction && satisfaction !== "no" && (
                   <div className="satisfaction-followup" data-testid="satisfaction-followup" role="status" style={{ marginTop: 12 }}>

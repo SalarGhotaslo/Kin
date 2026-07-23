@@ -19,7 +19,7 @@ describe("AppShell (feature test): onboarding through the tabbed app", () => {
     vi.useRealTimers();
   });
 
-  it("walks a parent from onboarding to Home, then through Ask AI to a clinician chat and back", async () => {
+  it("walks a parent from onboarding to Home, then through Ask Kin to a clinician chat and back", async () => {
     render(<AppShell />);
 
     expect(screen.getByTestId("screen-onboarding")).toBeInTheDocument();
@@ -39,7 +39,7 @@ describe("AppShell (feature test): onboarding through the tabbed app", () => {
     fireEvent.click(screen.getByTestId("talk-to-nurse"));
     expect(screen.getByTestId("screen-clinicianChat")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: /back to ask kin ai/i }));
+    fireEvent.click(screen.getByRole("button", { name: /back to ask kin/i }));
     expect(screen.getByTestId("screen-ask")).toBeInTheDocument();
     // The thread survived the round trip because its state lives in AppShell, not AskTab.
     expect(screen.getByTestId("intervention-card")).toBeInTheDocument();

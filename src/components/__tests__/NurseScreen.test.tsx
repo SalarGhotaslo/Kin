@@ -74,7 +74,7 @@ describe("NurseScreen", () => {
   it("calls onBack when the header back button is clicked", () => {
     const onBack = vi.fn();
     render(<NurseScreen onBack={onBack} onDone={() => {}} />);
-    fireEvent.click(screen.getByRole("button", { name: /back to ask kin ai/i }));
+    fireEvent.click(screen.getByRole("button", { name: /back to ask kin/i }));
     expect(onBack).toHaveBeenCalledTimes(1);
   });
 });

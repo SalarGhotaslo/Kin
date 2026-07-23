@@ -54,7 +54,7 @@ export default function NurseScreen({ onBack, onDone }: NurseScreenProps) {
     <section className="app-view" id="screen-nurse" data-testid="screen-clinicianChat" tabIndex={-1} aria-label="Nurse chat">
       <header className="top-bar">
         <div className="top-bar-row">
-          <button type="button" className="top-bar-icon-btn" aria-label="Back to Ask Kin AI" onClick={onBack}>
+          <button type="button" className="top-bar-icon-btn" aria-label="Back to Ask Kin" onClick={onBack}>
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M15 18l-6-6 6-6" />
             </svg>
@@ -95,7 +95,7 @@ export default function NurseScreen({ onBack, onDone }: NurseScreenProps) {
       {footerVisible && (
         <div className="sticky-footer" data-testid="nurse-footer">
           <button type="button" className="btn btn-primary btn-block" data-testid="nurse-done" onClick={onDone}>
-            Done — back to Ask AI
+            Done — back to Ask Kin
           </button>
         </div>
       )}

@@ -15,7 +15,7 @@ export type Tab = "home" | "ask" | "knowledge" | "profile";
 
 export const TABS: { id: Tab; label: string }[] = [
   { id: "home", label: "Home" },
-  { id: "ask", label: "Ask AI" },
+  { id: "ask", label: "Ask Kin" },
   { id: "knowledge", label: "Knowledge" },
   { id: "profile", label: "Profile" },
 ];
@@ -126,7 +126,7 @@ export const DEFAULT_PARENT_PROFILE: ParentProfile = {
   languageCode: "en",
 };
 
-export const PARENT_USER = { name: "Alex Johnson" } as const;
+export const PARENT_USER = { name: "Priya J" } as const;
 
 export function parentTagline(children: Child[], profile: ParentProfile): string {
   const count = children.length;
@@ -216,6 +216,15 @@ export const KNOWLEDGE_CATALOG: KnowledgeArticle[] = [
     topic: "sleep",
   },
   {
+    id: "sleep-preschool",
+    title: "Night waking in preschoolers: what feels normal and what needs attention",
+    excerpt: "A simple framework for sorting fear-based waking from developmental phase changes, with calming steps that work.",
+    reviewer: "Dr. Maya Patel, Sleep Specialist",
+    reviewDate: "10 Jul 2026",
+    age: "preschool",
+    topic: "sleep",
+  },
+  {
     id: "feeding-toddler",
     title: "Intro to solid foods: the 6-month guide",
     excerpt: "Safe first foods, textures to try in order, and choking-hazard foods to avoid at every stage.",
@@ -234,12 +243,39 @@ export const KNOWLEDGE_CATALOG: KnowledgeArticle[] = [
     topic: "feeding",
   },
   {
+    id: "feeding-school",
+    title: "School-age mealtimes: keeping nutrition steady when routines change",
+    excerpt: "Practical strategies for packed lunches, after-school hunger, and supporting appetite without turning meals into a battle.",
+    reviewer: "Dr. L. Moreno, Family Dietitian",
+    reviewDate: "18 Jun 2026",
+    age: "school",
+    topic: "feeding",
+  },
+  {
     id: "behaviour-tantrums",
     title: "Big feelings, small people: handling tantrums at 2–3 years",
     excerpt: "What's developmentally normal, co-regulation techniques, and when frequency/intensity is worth flagging.",
     reviewer: "Dr. James Chan, Child Psychologist",
     reviewDate: "14 Apr 2026",
     age: "toddler",
+    topic: "behaviour",
+  },
+  {
+    id: "behaviour-screen-time",
+    title: "Routines and resistance: supporting smoother transitions in the afternoon",
+    excerpt: "How to build predictable transitions for tired children, especially around screen time, snack time, and bedtime.",
+    reviewer: "Dr. Sophie Lewis, Child Psychologist",
+    reviewDate: "22 Jul 2026",
+    age: "preschool",
+    topic: "behaviour",
+  },
+  {
+    id: "behaviour-teen",
+    title: "Teen communication: staying connected during emotional ups and downs",
+    excerpt: "A calm, respectful approach to helping teens feel heard without turning every conversation into a conflict.",
+    reviewer: "Dr. N. Hassan, Adolescent Therapist",
+    reviewDate: "4 Jul 2026",
+    age: "teenager",
     topic: "behaviour",
   },
 ];

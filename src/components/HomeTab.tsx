@@ -90,7 +90,7 @@ export default function HomeTab({
                   <path d="M12 3a7 7 0 0 0-5.5 11.3L5 19l4.9-1.4A7 7 0 1 0 12 3z" />
                 </svg>
               </span>
-              Ask AI
+              Ask Kin
             </button>
             <button type="button" className="quick-action-btn" data-testid="quick-action-find-doctor" onClick={onFindDoctor}>
               <span className="quick-action-icon primary" aria-hidden="true">
@@ -150,7 +150,7 @@ export default function HomeTab({
 
       </div>
 
-      <button type="button" className="fab" aria-label="Ask Kin AI" data-testid="home-fab" onClick={onAskAi}>
+      <button type="button" className="fab" aria-label="Ask Kin" data-testid="home-fab" onClick={onAskAi}>
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M12 3a7 7 0 0 0-5.5 11.3L5 19l4.9-1.4A7 7 0 1 0 12 3z" />
         </svg>

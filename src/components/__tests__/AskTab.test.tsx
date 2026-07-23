@@ -74,7 +74,6 @@ describe("AskTab", () => {
     });
 
     expect(screen.queryByTestId("intervention-card")).not.toBeInTheDocument();
-    expect(screen.getByTestId("community-quote-card")).toBeInTheDocument();
     expect(screen.getByTestId("game-card")).toBeInTheDocument();
     expect(screen.getByTestId("watch-card")).toBeInTheDocument();
     expect(screen.getByTestId("recommended-clinicians")).toBeInTheDocument();
@@ -90,7 +89,8 @@ describe("AskTab", () => {
     });
 
     fireEvent.click(screen.getByTestId("satisfaction-no"));
-    expect(onConnectClinician).toHaveBeenCalledWith("chat");
+    expect(screen.getByTestId("professional-prompt")).toBeInTheDocument();
+    expect(onConnectClinician).not.toHaveBeenCalled();
   });
 
   it("connecting to a clinician can request chat or video", async () => {
