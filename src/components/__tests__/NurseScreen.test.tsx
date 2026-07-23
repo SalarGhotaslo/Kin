@@ -21,13 +21,13 @@ describe("NurseScreen", () => {
   });
 
   it("starts with an empty chat and no footer CTA", () => {
-    render(<NurseScreen onDone={() => {}} />);
+    render(<NurseScreen onBack={() => {}} onDone={() => {}} />);
     expect(screen.queryByTestId(/^chat-bubble-/)).not.toBeInTheDocument();
     expect(screen.queryByTestId("nurse-footer")).not.toBeInTheDocument();
   });
 
   it("shows a typing indicator before the nurse's first message appears", async () => {
-    render(<NurseScreen onDone={() => {}} />);
+    render(<NurseScreen onBack={() => {}} onDone={() => {}} />);
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(CHAT_TIMING.initialDelay + 10);
@@ -42,7 +42,7 @@ describe("NurseScreen", () => {
   });
 
   it("renders the full scripted conversation in order and reveals the footer CTA once it's done", async () => {
-    render(<NurseScreen onDone={() => {}} />);
+    render(<NurseScreen onBack={() => {}} onDone={() => {}} />);
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(totalScriptDuration() + 20);
@@ -61,7 +61,7 @@ describe("NurseScreen", () => {
 
   it("calls onDone when the footer CTA is clicked", async () => {
     const onDone = vi.fn();
-    render(<NurseScreen onDone={onDone} />);
+    render(<NurseScreen onBack={() => {}} onDone={onDone} />);
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(totalScriptDuration() + 20);
@@ -69,5 +69,12 @@ describe("NurseScreen", () => {
 
     fireEvent.click(screen.getByTestId("nurse-done"));
     expect(onDone).toHaveBeenCalledTimes(1);
+  });
+
+  it("calls onBack when the header back button is clicked", () => {
+    const onBack = vi.fn();
+    render(<NurseScreen onBack={onBack} onDone={() => {}} />);
+    fireEvent.click(screen.getByRole("button", { name: /back to ask kin ai/i }));
+    expect(onBack).toHaveBeenCalledTimes(1);
   });
 });

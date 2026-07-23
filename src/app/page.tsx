@@ -1,5 +1,5 @@
-import KinPrototype from "@/components/KinPrototype";
+import AppShell from "@/components/AppShell";
 
 export default function Home() {
-  return <KinPrototype />;
+  return <AppShell />;
 }

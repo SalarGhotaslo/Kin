@@ -1,36 +1,42 @@
 export type AgeId = "newborn" | "infant" | "toddler" | "preschool" | "school";
 
+/** Internal routing screen. Bottom-nav tabs are derived from this via `tabForScreen`. */
 export type Screen =
   | "onboarding"
   | "home"
   | "outbreak"
   | "ask"
-  | "response"
-  | "clinicianChoice"
-  | "nurseChat"
-  | "videoCall";
+  | "clinicianChat"
+  | "clinicianVideo"
+  | "knowledge"
+  | "profile";
 
-export const SCREENS: Screen[] = [
-  "onboarding",
-  "home",
-  "outbreak",
-  "ask",
-  "response",
-  "clinicianChoice",
-  "nurseChat",
-  "videoCall",
+export type Tab = "home" | "ask" | "knowledge" | "profile";
+
+export const TABS: { id: Tab; label: string }[] = [
+  { id: "home", label: "Home" },
+  { id: "ask", label: "Ask AI" },
+  { id: "knowledge", label: "Knowledge" },
+  { id: "profile", label: "Profile" },
 ];
 
-export const CLOCK_BY_SCREEN: Record<Screen, string> = {
-  onboarding: "2:47",
-  home: "2:48",
-  outbreak: "2:48",
-  ask: "2:50",
-  response: "2:53",
-  clinicianChoice: "2:58",
-  nurseChat: "3:00",
-  videoCall: "3:00",
-};
+export function tabForScreen(screen: Screen): Tab | null {
+  switch (screen) {
+    case "onboarding":
+      return null;
+    case "home":
+    case "outbreak":
+      return "home";
+    case "ask":
+    case "clinicianChat":
+    case "clinicianVideo":
+      return "ask";
+    case "knowledge":
+      return "knowledge";
+    case "profile":
+      return "profile";
+  }
+}
 
 export interface AgeOption {
   id: AgeId;
@@ -44,6 +50,21 @@ export const AGE_OPTIONS: AgeOption[] = [
   { id: "toddler", label: "Toddler", sub: "1–3 years" },
   { id: "preschool", label: "Preschool", sub: "3–5 years" },
   { id: "school", label: "School-age", sub: "5+ years" },
+];
+
+/** Broader life-stage groups shown on Profile's "Family Context" — several AgeIds can roll up into one stage. */
+export interface StageGroup {
+  id: string;
+  label: string;
+  sub: string;
+  ages: AgeId[];
+}
+
+export const STAGE_GROUPS: StageGroup[] = [
+  { id: "infant", label: "Infant", sub: "0–12 mo", ages: ["newborn", "infant"] },
+  { id: "toddler", label: "Toddler", sub: "1–3 yrs", ages: ["toddler"] },
+  { id: "preschool", label: "Preschool", sub: "3–5 yrs", ages: ["preschool"] },
+  { id: "school", label: "School Age", sub: "6–12 yrs", ages: ["school"] },
 ];
 
 /** A child added during onboarding. Session-only — nothing here is persisted to an account. */
@@ -82,7 +103,7 @@ export interface LanguageOption {
 }
 
 export const LANGUAGE_OPTIONS: LanguageOption[] = [
-  { code: "en", label: "English" },
+  { code: "en", label: "English (US)" },
   { code: "es", label: "Español" },
   { code: "pt", label: "Português" },
   { code: "pl", label: "Polski" },
@@ -102,6 +123,14 @@ export const DEFAULT_PARENT_PROFILE: ParentProfile = {
   ethnicBackground: "Prefer not to say",
   languageCode: "en",
 };
+
+export const PARENT_USER = { name: "Alex Johnson" } as const;
+
+export function parentTagline(children: Child[], profile: ParentProfile): string {
+  const count = children.length;
+  const childWord = count === 1 ? "1 child" : `${count} children`;
+  return profile.languageCode !== "en" ? `Parent of ${childWord} · Multilingual Support Active` : `Parent of ${childWord}`;
+}
 
 export interface Guide {
   title: string;
@@ -146,6 +175,74 @@ export function getGuideForAge(age: AgeId | null): Guide {
   return GUIDE_BY_AGE[age ?? "infant"];
 }
 
+/** Flat, filterable catalog for the Knowledge tab — spans topics and ages, not just fever. */
+export interface KnowledgeArticle {
+  id: string;
+  title: string;
+  excerpt: string;
+  reviewer: string;
+  reviewDate: string;
+  age: AgeId;
+  topic: TopicId;
+}
+
+export type TopicId = "fever" | "sleep" | "feeding" | "behaviour";
+
+export const KNOWLEDGE_CATALOG: KnowledgeArticle[] = [
+  ...AGE_OPTIONS.map((age) => ({
+    id: `fever-${age.id}`,
+    title: GUIDE_BY_AGE[age.id].title,
+    excerpt: GUIDE_BY_AGE[age.id].excerpt,
+    reviewer: GUIDE_BY_AGE[age.id].byline.replace(/^Reviewed by /, "").split(" · ")[0],
+    reviewDate: GUIDE_BY_AGE[age.id].byline.split(" · ")[1],
+    age: age.id,
+    topic: "fever" as TopicId,
+  })),
+  {
+    id: "sleep-toddler",
+    title: "Sleep regression survival kit for toddlers",
+    excerpt: "Consistent wind-down routines, safe co-sleeping alternatives, and how long a regression typically lasts.",
+    reviewer: "Dr. R. Chen, Paediatric Nurse Practitioner",
+    reviewDate: "2 Jun 2026",
+    age: "toddler",
+    topic: "sleep",
+  },
+  {
+    id: "feeding-toddler",
+    title: "Intro to solid foods: the 6-month guide",
+    excerpt: "Safe first foods, textures to try in order, and choking-hazard foods to avoid at every stage.",
+    reviewer: "Dr. A. Osei, Paediatrician",
+    reviewDate: "20 May 2026",
+    age: "infant",
+    topic: "feeding",
+  },
+  {
+    id: "feeding-picky",
+    title: "Picky eating at age 2: food neophobia explained",
+    excerpt: "Why toddlers suddenly reject foods they used to eat, and the One-Bite Rule for introducing new ones.",
+    reviewer: "Dr. A. Osei, Paediatrician",
+    reviewDate: "1 Jul 2026",
+    age: "toddler",
+    topic: "feeding",
+  },
+  {
+    id: "behaviour-tantrums",
+    title: "Big feelings, small people: handling tantrums at 2–3 years",
+    excerpt: "What's developmentally normal, co-regulation techniques, and when frequency/intensity is worth flagging.",
+    reviewer: "Dr. James Chan, Child Psychologist",
+    reviewDate: "14 Apr 2026",
+    age: "toddler",
+    topic: "behaviour",
+  },
+];
+
+export const TOPICS: { id: TopicId; label: string }[] = [
+  { id: "fever", label: "Fever" },
+  { id: "sleep", label: "Sleep" },
+  { id: "feeding", label: "Feeding" },
+  { id: "behaviour", label: "Behaviour" },
+];
+
 export const DEFAULT_SUGGESTED_QUESTION = "My baby has a fever, what should I do?";
 
 export function normalizePostText(raw: string): string {
@@ -154,7 +251,7 @@ export function normalizePostText(raw: string): string {
 }
 
 export interface TopicSuggestion {
-  id: string;
+  id: TopicId;
   label: string;
   question: string;
 }
@@ -162,9 +259,100 @@ export interface TopicSuggestion {
 export const TOPIC_SUGGESTIONS: TopicSuggestion[] = [
   { id: "fever", label: "Fever", question: DEFAULT_SUGGESTED_QUESTION },
   { id: "sleep", label: "Sleep", question: "My toddler keeps waking up at night, is that normal?" },
-  { id: "feeding", label: "Feeding", question: "My baby is refusing feeds today, should I be worried?" },
+  { id: "feeding", label: "Feeding", question: "My 2-year-old is refusing to eat anything but pasta. Is this normal and how can I introduce new foods?" },
   { id: "behaviour", label: "Behaviour", question: "My child has started having big tantrums, how do I handle it?" },
 ];
+
+export interface CommunityQuote {
+  author: string;
+  text: string;
+}
+
+export interface SuggestedActivity {
+  title: string;
+  description: string;
+  ctaLabel: string;
+}
+
+export interface AiResponse {
+  intro: string;
+  bullets: string[];
+  followUpNote: string;
+  game?: SuggestedActivity;
+  watch?: { title: string };
+  communityQuote?: CommunityQuote;
+  /** Only set for the one scripted risk scenario (fever/aspirin) — everything else is a safe reply. */
+  hasRiskyReply?: boolean;
+}
+
+export const AI_RESPONSE_BY_TOPIC: Record<TopicId, AiResponse> = {
+  feeding: {
+    intro:
+      "Yes, this is very normal! Around age 2, many children go through a phase called food neophobia (fear of new foods) or selective eating. It's often a developmental stage related to their growing need for autonomy.",
+    bullets: [
+      "The “One-Bite” Rule: Encourage them to just touch or lick a new food without pressure to swallow.",
+      "Keep pasta on the plate: Pair the familiar (pasta) with a tiny portion of the unfamiliar (broccoli).",
+      "Model the behavior: Let them see you enjoying a variety of colorful foods.",
+    ],
+    followUpNote:
+      "Pediatricians suggest it can take up to 8–10 exposures before a child accepts a new taste. Patience is your best tool here.",
+    game: {
+      title: "Sensory Texture Exploration",
+      description: "Use colorful blocks and different textures to engage your toddler's senses before mealtime.",
+      ctaLabel: "View Game Guide",
+    },
+    watch: { title: "Let's Play With Food! Fun & Healthy Snacks" },
+    communityQuote: {
+      author: "Alex P.",
+      text: "Our toddler loved the sensory bin idea! It helped distract them from the mealtime battle.",
+    },
+  },
+  fever: {
+    intro:
+      "A fever on its own usually isn't an emergency — it's the body fighting an infection. What matters most is your child's age and how they're acting alongside the number on the thermometer.",
+    bullets: [
+      "Dress lightly and offer fluids often — overdressing traps heat in.",
+      "Paracetamol at the right dose for weight/age can help with discomfort, never aspirin for infants or toddlers.",
+      "Track the pattern: how high, how long, and whether anything else (rash, breathing, feeding) changes alongside it.",
+    ],
+    followUpNote: "Under 3 months, any fever needs same-day clinical review — age changes the threshold for urgency.",
+    hasRiskyReply: true,
+  },
+  sleep: {
+    intro:
+      "Sleep regressions are common around big developmental leaps (walking, talking, separation anxiety) and usually pass within 2–6 weeks with a steady routine.",
+    bullets: [
+      "Keep bed/wake times consistent, even after a rough night.",
+      "A short, predictable wind-down routine cues the brain that sleep is coming.",
+      "Avoid introducing new sleep props (rocking to sleep, etc.) you'll need to undo later.",
+    ],
+    followUpNote: "If night-waking is paired with snoring, gasping, or daytime sleepiness, it's worth a clinician check.",
+    game: {
+      title: "Wind-Down Story Cards",
+      description: "A simple 3-card sequence (bath, story, song) your toddler can help choose each night.",
+      ctaLabel: "View Routine Guide",
+    },
+    communityQuote: {
+      author: "Priya T.",
+      text: "The same 3 songs every night, in the same order, was what finally got us through the regression.",
+    },
+  },
+  behaviour: {
+    intro:
+      "Big tantrums at this age are developmentally normal — your child's emotions are outpacing their ability to communicate and self-regulate.",
+    bullets: [
+      "Name the feeling calmly (“you're really frustrated right now”) rather than reasoning mid-meltdown.",
+      "Stay close and steady — co-regulation teaches self-regulation over time.",
+      "Praise the recovery, not just the compliance, once they're calm again.",
+    ],
+    followUpNote: "Frequent, prolonged tantrums past age 4, or ones involving self-harm, are worth flagging to a clinician.",
+    watch: { title: "Staying Calm Through Toddler Meltdowns" },
+    communityQuote: {
+      author: "Dana K.",
+      text: "Getting down to his eye level before saying anything cut our meltdowns almost in half.",
+    },
+  },
+};
 
 export type NurseMessage = { from: "nurse" | "parent"; text: string };
 
@@ -200,7 +388,7 @@ export const FLAG_REASON =
 export const WHY_FLAGGED_DETAIL =
   "Kin's Sentinel model classifies community replies for unverified or dangerous medical advice in real time. Aspirin in children is a known, well-documented risk — this reply matched that pattern with high confidence and was hidden before most members saw it.";
 
-/** Sentinel sequence timing, in ms from the moment the response screen is shown. */
+/** Sentinel sequence timing, in ms from the moment the response thread is shown. */
 export const SENTINEL_TIMING = {
   safeReplyAt: 900,
   riskyReplyRevealAt: 1900,
@@ -221,6 +409,18 @@ export type Satisfaction = "yes" | "partially" | "no";
 
 export type ClinicianMode = "chat" | "video";
 
+export interface RecommendedClinician {
+  id: string;
+  name: string;
+  specialty: string;
+  initials: string;
+}
+
+export const RECOMMENDED_CLINICIANS: RecommendedClinician[] = [
+  { id: "sarah-mitchell", name: "Dr. Sarah Mitchell", specialty: "Pediatrician", initials: "SM" },
+  { id: "james-chan", name: "Dr. James Chan", specialty: "Psychologist", initials: "JC" },
+];
+
 /** Mocked local-outbreak alert shown on the home screen. */
 export const OUTBREAK_ALERT = {
   headline: "Chickenpox cases rising in South London",
@@ -238,3 +438,54 @@ export const OUTBREAK_ALERT = {
 export const VIDEO_CALL_TIMING = {
   connectingFor: 2200,
 } as const;
+
+export interface DailyInsight {
+  id: string;
+  tag: string;
+  title: string;
+  subtitle: string;
+}
+
+export const DAILY_INSIGHTS: DailyInsight[] = [
+  { id: "sleep", tag: "SLEEP", title: "Mastering Sleep", subtitle: "Tips for transitioning your toddler to a consistent bedtime routine." },
+  { id: "nutrition", tag: "NUTRITION", title: "Picky Eating Phases", subtitle: "Why food neophobia happens and how to keep mealtimes calm." },
+  { id: "development", tag: "MILESTONES", title: "Talking Timelines", subtitle: "What vocabulary growth typically looks like between 18–30 months." },
+];
+
+export interface RecentActivity {
+  tagLabel: string;
+  summary: string;
+  suggestion: string;
+  continueTopic: TopicId;
+}
+
+export const RECENT_ACTIVITY: RecentActivity = {
+  tagLabel: "AI CONSULTATION",
+  summary: "My 2-year-old is refusing to eat anything but pasta. Kin suggested “Try exposure therapy with small portions of colorful veggies alongside the pasta.”",
+  suggestion: "Try exposure therapy with small portions of colorful veggies alongside the pasta.",
+  continueTopic: "feeding",
+};
+
+export interface Milestone {
+  goalLabel: string;
+  percentage: number;
+}
+
+export const MILESTONE: Milestone = {
+  goalLabel: "vocabulary goal",
+  percentage: 85,
+};
+
+export interface PrivacyToggles {
+  anonymousTraining: boolean;
+  cloudBackup: boolean;
+  dataRetention: boolean;
+}
+
+export const DEFAULT_PRIVACY_TOGGLES: PrivacyToggles = {
+  anonymousTraining: true,
+  cloudBackup: true,
+  dataRetention: false,
+};
+
+export const NOTIFICATION_COUNT = 2;

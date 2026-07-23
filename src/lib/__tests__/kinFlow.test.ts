@@ -1,20 +1,27 @@
 import { describe, expect, it } from "vitest";
 import {
   AGE_OPTIONS,
-  CLOCK_BY_SCREEN,
+  AI_RESPONSE_BY_TOPIC,
   DEFAULT_SUGGESTED_QUESTION,
   ETHNIC_BACKGROUNDS,
   GUIDE_BY_AGE,
+  KNOWLEDGE_CATALOG,
   LANGUAGE_OPTIONS,
   NURSE_SCRIPT,
   OUTBREAK_ALERT,
   PARENT_AGE_BANDS,
+  RECOMMENDED_CLINICIANS,
   RELATIONSHIP_STATUSES,
-  SCREENS,
+  STAGE_GROUPS,
+  TABS,
+  TOPICS,
   TOPIC_SUGGESTIONS,
   createChild,
   getGuideForAge,
   normalizePostText,
+  parentTagline,
+  tabForScreen,
+  type Screen,
 } from "../kinFlow";
 
 describe("getGuideForAge", () => {
@@ -27,14 +34,6 @@ describe("getGuideForAge", () => {
 
   it("falls back to the infant guide when no age is selected", () => {
     expect(getGuideForAge(null)).toBe(GUIDE_BY_AGE.infant);
-  });
-
-  it("every guide has a non-empty title, excerpt and byline", () => {
-    for (const guide of Object.values(GUIDE_BY_AGE)) {
-      expect(guide.title.length).toBeGreaterThan(0);
-      expect(guide.excerpt.length).toBeGreaterThan(0);
-      expect(guide.byline.length).toBeGreaterThan(0);
-    }
   });
 });
 
@@ -63,33 +62,44 @@ describe("createChild", () => {
   });
 });
 
-describe("SCREENS / CLOCK_BY_SCREEN", () => {
-  it("has a clock entry for every screen, in the same order the flow progresses", () => {
-    expect(SCREENS).toEqual([
-      "onboarding",
-      "home",
-      "outbreak",
-      "ask",
-      "response",
-      "clinicianChoice",
-      "nurseChat",
-      "videoCall",
-    ]);
-    for (const screen of SCREENS) {
-      expect(CLOCK_BY_SCREEN[screen]).toMatch(/^\d{1,2}:\d{2}$/);
+describe("tabForScreen", () => {
+  it("maps every non-onboarding screen to exactly one bottom-nav tab", () => {
+    const cases: [Screen, string | null][] = [
+      ["onboarding", null],
+      ["home", "home"],
+      ["outbreak", "home"],
+      ["ask", "ask"],
+      ["clinicianChat", "ask"],
+      ["clinicianVideo", "ask"],
+      ["knowledge", "knowledge"],
+      ["profile", "profile"],
+    ];
+    for (const [screen, expected] of cases) {
+      expect(tabForScreen(screen)).toBe(expected);
     }
   });
 
-  it("clock time is non-decreasing across the main path (onboarding through nurse chat)", () => {
-    const toMinutes = (t: string) => {
-      const [h, m] = t.split(":").map(Number);
-      return h * 60 + m;
-    };
-    const mainPath: (typeof SCREENS)[number][] = ["onboarding", "home", "ask", "response", "clinicianChoice", "nurseChat"];
-    const times = mainPath.map((s) => toMinutes(CLOCK_BY_SCREEN[s]));
-    for (let i = 1; i < times.length; i++) {
-      expect(times[i]).toBeGreaterThanOrEqual(times[i - 1]);
+  it("every tab in TABS is reachable from at least one screen", () => {
+    const reachable = new Set(
+      (["home", "outbreak", "ask", "clinicianChat", "clinicianVideo", "knowledge", "profile"] as Screen[]).map(tabForScreen)
+    );
+    for (const tab of TABS) {
+      expect(reachable.has(tab.id)).toBe(true);
     }
+  });
+});
+
+describe("parentTagline", () => {
+  it("counts children singular vs plural", () => {
+    const profile = { parentAgeBand: "Prefer not to say", relationshipStatus: "Prefer not to say", ethnicBackground: "Prefer not to say", languageCode: "en" } as const;
+    expect(parentTagline([createChild("Liam", "infant")], profile)).toBe("Parent of 1 child");
+    expect(parentTagline([createChild("Liam", "infant"), createChild("Maya", "toddler")], profile)).toBe("Parent of 2 children");
+  });
+
+  it("mentions multilingual support only when a non-English language is set", () => {
+    const base = { parentAgeBand: "Prefer not to say", relationshipStatus: "Prefer not to say", ethnicBackground: "Prefer not to say" } as const;
+    expect(parentTagline([], { ...base, languageCode: "en" })).not.toMatch(/multilingual/i);
+    expect(parentTagline([], { ...base, languageCode: "es" })).toMatch(/multilingual/i);
   });
 });
 
@@ -126,17 +136,72 @@ describe("onboarding option lists", () => {
   });
 });
 
-describe("TOPIC_SUGGESTIONS", () => {
-  it("each topic has a non-empty label and a full question", () => {
+describe("STAGE_GROUPS", () => {
+  it("covers every AgeId across all groups exactly once", () => {
+    const allAges = STAGE_GROUPS.flatMap((g) => g.ages);
+    expect(new Set(allAges).size).toBe(allAges.length);
+    for (const option of AGE_OPTIONS) {
+      expect(allAges).toContain(option.id);
+    }
+  });
+});
+
+describe("TOPIC_SUGGESTIONS / AI_RESPONSE_BY_TOPIC", () => {
+  it("each topic suggestion has a non-empty label and a full question", () => {
     for (const topic of TOPIC_SUGGESTIONS) {
       expect(topic.label.length).toBeGreaterThan(0);
       expect(topic.question.length).toBeGreaterThan(10);
     }
   });
 
-  it("has unique ids", () => {
+  it("has unique ids matching a defined AI response", () => {
     const ids = TOPIC_SUGGESTIONS.map((t) => t.id);
     expect(new Set(ids).size).toBe(ids.length);
+    for (const id of ids) {
+      expect(AI_RESPONSE_BY_TOPIC[id]).toBeDefined();
+    }
+  });
+
+  it("only the fever topic triggers the Sentinel risky-reply scenario", () => {
+    expect(AI_RESPONSE_BY_TOPIC.fever.hasRiskyReply).toBe(true);
+    expect(AI_RESPONSE_BY_TOPIC.sleep.hasRiskyReply).toBeFalsy();
+    expect(AI_RESPONSE_BY_TOPIC.feeding.hasRiskyReply).toBeFalsy();
+    expect(AI_RESPONSE_BY_TOPIC.behaviour.hasRiskyReply).toBeFalsy();
+  });
+
+  it("every response has at least 2 concrete bullets and a follow-up note", () => {
+    for (const response of Object.values(AI_RESPONSE_BY_TOPIC)) {
+      expect(response.bullets.length).toBeGreaterThanOrEqual(2);
+      expect(response.followUpNote.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe("RECOMMENDED_CLINICIANS", () => {
+  it("has at least one clinician with a name, specialty and initials", () => {
+    expect(RECOMMENDED_CLINICIANS.length).toBeGreaterThan(0);
+    for (const clinician of RECOMMENDED_CLINICIANS) {
+      expect(clinician.name.length).toBeGreaterThan(0);
+      expect(clinician.specialty.length).toBeGreaterThan(0);
+      expect(clinician.initials.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe("KNOWLEDGE_CATALOG", () => {
+  it("has unique ids and a valid topic for every article", () => {
+    const ids = KNOWLEDGE_CATALOG.map((a) => a.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    const topicIds = new Set(TOPICS.map((t) => t.id));
+    for (const article of KNOWLEDGE_CATALOG) {
+      expect(topicIds.has(article.topic)).toBe(true);
+    }
+  });
+
+  it("covers every topic with at least one article", () => {
+    for (const topic of TOPICS) {
+      expect(KNOWLEDGE_CATALOG.some((a) => a.topic === topic.id)).toBe(true);
+    }
   });
 });
 
