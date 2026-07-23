@@ -257,9 +257,15 @@ a {
   background: rgba(255, 255, 255, 0.28);
 }
 .top-bar-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-weight: 700;
   font-size: 1.05rem;
   letter-spacing: -0.01em;
+}
+.top-bar-title img {
+  border-radius: 4px;
 }
 .top-bar-heading {
   margin-top: 14px;

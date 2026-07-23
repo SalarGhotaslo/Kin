@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { NOTIFICATION_COUNT } from "@/lib/kinFlow";
 
 export interface TopBarIconRowProps {
@@ -16,7 +17,10 @@ export function TopBarIconRow({ onOpenMenu, onOpenNotifications, showNotificatio
           <path d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
-      <span className="top-bar-title">Kin</span>
+      <span className="top-bar-title">
+        <Image src="/kin-mark.png" alt="" width={18} height={18} aria-hidden="true" />
+        Kin
+      </span>
       <button
         type="button"
         className="top-bar-icon-btn"

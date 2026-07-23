@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   AGE_OPTIONS,
   ETHNIC_BACKGROUNDS,
@@ -48,7 +49,7 @@ export default function OnboardingScreen({
       <div className="onboarding-header">
         <div className="onboarding-hero">
           <div className="onboarding-icon" aria-hidden="true">
-            ✦
+            <Image src="/kin-mark.png" alt="" width={26} height={26} />
           </div>
           <div className="onboarding-copy">
             <h1>Kin</h1>
