@@ -30,6 +30,7 @@ describe("AppShell (feature test): onboarding through the tabbed app", () => {
 
     expect(screen.getByTestId("screen-ask")).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("topic-fever"));
+    fireEvent.click(screen.getByTestId("response-mode-medical"));
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(SENTINEL_TIMING.interventionAt + 10);
@@ -51,6 +52,7 @@ describe("AppShell (feature test): onboarding through the tabbed app", () => {
 
     fireEvent.click(screen.getByTestId("nav-ask"));
     fireEvent.click(screen.getByTestId("topic-feeding"));
+    fireEvent.click(screen.getByTestId("response-mode-medical"));
     await act(async () => {
       await vi.advanceTimersByTimeAsync(SENTINEL_TIMING.safeReplyAt + 10);
     });
@@ -115,6 +117,7 @@ describe("AppShell (feature test): onboarding through the tabbed app", () => {
     completeOnboarding();
     fireEvent.click(screen.getByTestId("nav-ask"));
     fireEvent.click(screen.getByTestId("topic-fever"));
+    fireEvent.click(screen.getByTestId("response-mode-medical"));
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(SENTINEL_TIMING.interventionAt + 10);

@@ -48,7 +48,7 @@ export default function AskTab({
   const [composerValue, setComposerValue] = useState("");
   const [showWhy, setShowWhy] = useState(false);
   const [localStage, setLocalStage] = useState<LocalStage>(settled ? "done" : "waiting");
-  const [responseMode, setResponseMode] = useState<"medical" | "community">("medical");
+  const [responseMode, setResponseMode] = useState<"medical" | "community" | null>(null);
 
   // A newly-asked question always starts unsettled; reset the reveal animation
   // synchronously during render (React's documented pattern for "reset state
@@ -58,7 +58,7 @@ export default function AskTab({
     setTrackedQuestion(question);
     setLocalStage(settled ? "done" : "waiting");
     setShowWhy(false);
-    setResponseMode("medical");
+    setResponseMode(null);
   }
 
   useEffect(() => {
@@ -126,32 +126,47 @@ export default function AskTab({
               {question}
             </p>
 
-            <div className="card response-card" data-testid={isMedicalMode ? "ai-response-card" : "community-response-card"}>
-              <div className="tag-row">
-                <span className={`pill-tag ${isMedicalMode ? "primary" : "secondary"}`}>{isMedicalMode ? "Medical response" : "Community response"}</span>
-                <span className={`pill-tag ${isMedicalMode ? "tertiary" : "primary"}`}>{isMedicalMode ? "Professional Source" : "Shared experience"}</span>
+            {responseMode === null ? (
+              <div className="card" data-testid="response-mode-picker">
+                <span className="field-label">Choose an answer style</span>
+                <p>Start with expert guidance or see how the community is responding.</p>
+                <div className="intervention-actions" style={{ marginTop: 12 }}>
+                  <button type="button" className="btn btn-primary btn-sm" data-testid="response-mode-medical" onClick={() => setResponseMode("medical")}>
+                    Medical response
+                  </button>
+                  <button type="button" className="btn btn-ghost btn-sm" data-testid="response-mode-community" onClick={() => setResponseMode("community")}>
+                    Community response
+                  </button>
+                </div>
               </div>
-              <p>{response.intro}</p>
-              {isMedicalMode && (
-                <ul>
-                  {response.bullets.map((b) => (
-                    <li key={b}>{b}</li>
-                  ))}
-                </ul>
-              )}
-              {isMedicalMode ? <p className="followup-note">{response.followUpNote}</p> : <p className="followup-note">This answer is framed around lived experience and practical support you can try right away.</p>}
-              <div className="intervention-actions" style={{ marginTop: 12 }}>
-                {isMedicalMode ? (
-                  <button type="button" className="btn btn-ghost btn-sm" data-testid="switch-to-community" onClick={() => setResponseMode("community")}>
-                    Try the community response instead
-                  </button>
-                ) : (
-                  <button type="button" className="btn btn-ghost btn-sm" data-testid="switch-to-medical" onClick={() => setResponseMode("medical")}>
-                    Try the medical response instead
-                  </button>
+            ) : (
+              <div className="card response-card" data-testid={isMedicalMode ? "ai-response-card" : "community-response-card"}>
+                <div className="tag-row">
+                  <span className={`pill-tag ${isMedicalMode ? "primary" : "secondary"}`}>{isMedicalMode ? "Medical response" : "Community response"}</span>
+                  <span className={`pill-tag ${isMedicalMode ? "tertiary" : "primary"}`}>{isMedicalMode ? "Professional Source" : "Shared experience"}</span>
+                </div>
+                <p>{response.intro}</p>
+                {isMedicalMode && (
+                  <ul>
+                    {response.bullets.map((b) => (
+                      <li key={b}>{b}</li>
+                    ))}
+                  </ul>
                 )}
+                {isMedicalMode ? <p className="followup-note">{response.followUpNote}</p> : <p className="followup-note">This answer is framed around lived experience and practical support you can try right away.</p>}
+                <div className="intervention-actions" style={{ marginTop: 12 }}>
+                  {isMedicalMode ? (
+                    <button type="button" className="btn btn-ghost btn-sm" data-testid="switch-to-community" onClick={() => setResponseMode("community")}>
+                      Try the community response instead
+                    </button>
+                  ) : (
+                    <button type="button" className="btn btn-ghost btn-sm" data-testid="switch-to-medical" onClick={() => setResponseMode("medical")}>
+                      Try the medical response instead
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             {isMedicalMode && !showSafeReply && !isFlagged && (
               <p className="typing-note" data-testid="typing-note">

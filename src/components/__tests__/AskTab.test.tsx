@@ -52,6 +52,9 @@ describe("AskTab", () => {
     render(<Harness />);
     fireEvent.click(screen.getByTestId("topic-fever"));
 
+    expect(screen.getByTestId("response-mode-picker")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("response-mode-medical"));
+
     expect(screen.getByTestId("user-question")).toBeInTheDocument();
     expect(screen.getByTestId("ai-response-card")).toHaveTextContent("Professional Source");
 
@@ -68,6 +71,7 @@ describe("AskTab", () => {
   it("asking a non-fever topic (e.g. feeding) settles quickly with no risky reply or scan", async () => {
     render(<Harness />);
     fireEvent.click(screen.getByTestId("topic-feeding"));
+    fireEvent.click(screen.getByTestId("response-mode-medical"));
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(SENTINEL_TIMING.safeReplyAt + 10);
@@ -83,6 +87,7 @@ describe("AskTab", () => {
     const onConnectClinician = vi.fn();
     render(<Harness onConnectClinician={onConnectClinician} />);
     fireEvent.click(screen.getByTestId("topic-feeding"));
+    fireEvent.click(screen.getByTestId("response-mode-medical"));
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(SENTINEL_TIMING.safeReplyAt + 10);
@@ -97,6 +102,7 @@ describe("AskTab", () => {
     const onConnectClinician = vi.fn();
     render(<Harness onConnectClinician={onConnectClinician} />);
     fireEvent.click(screen.getByTestId("topic-feeding"));
+    fireEvent.click(screen.getByTestId("response-mode-medical"));
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(SENTINEL_TIMING.safeReplyAt + 10);
