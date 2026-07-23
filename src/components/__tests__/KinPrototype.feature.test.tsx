@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { CHAT_TIMING, GUIDE_BY_AGE, NURSE_SCRIPT, SENTINEL_TIMING } from "@/lib/kinFlow";
+import { CHAT_TIMING, GUIDE_BY_AGE, NURSE_SCRIPT, SENTINEL_TIMING, VIDEO_CALL_TIMING } from "@/lib/kinFlow";
 import KinPrototype from "../KinPrototype";
 
 function totalNurseScriptDuration() {
@@ -11,7 +11,13 @@ function totalNurseScriptDuration() {
   return delay + CHAT_TIMING.footerDelayAfterLast;
 }
 
-describe("Kin flagship flow (feature test): profile → feed → sentinel → nurse → content", () => {
+function addChild(name: string, ageTestId: string) {
+  fireEvent.change(screen.getByPlaceholderText("Name (optional)"), { target: { value: name } });
+  fireEvent.click(screen.getByTestId(ageTestId));
+  fireEvent.click(screen.getByTestId("add-child-btn"));
+}
+
+describe("Kin flagship flow (feature test): onboarding → home → ask → response → clinician → done", () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
   });
@@ -20,67 +26,135 @@ describe("Kin flagship flow (feature test): profile → feed → sentinel → nu
     vi.useRealTimers();
   });
 
-  it("walks a parent end-to-end and reinforces the nurse's guidance with an age-matched guide", async () => {
+  it("walks a parent end-to-end via chat and back to home", async () => {
     render(<KinPrototype />);
 
-    // 1. Session profile: required age, no account created.
-    expect(screen.getByTestId("screen-profile")).toBeInTheDocument();
-    fireEvent.click(screen.getByTestId("age-chip-toddler"));
-    fireEvent.click(screen.getByTestId("profile-continue"));
+    expect(screen.getByTestId("screen-onboarding")).toBeInTheDocument();
+    addChild("Liam", "draft-age-chip-infant");
+    fireEvent.click(screen.getByTestId("onboarding-continue"));
 
-    // 2. Community feed: ask via the suggestion chip.
-    expect(screen.getByTestId("screen-feed")).toBeInTheDocument();
-    fireEvent.click(screen.getByTestId("suggestion-chip"));
+    expect(screen.getByTestId("screen-home")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId(/select-child-/));
 
-    // 3. Sentinel flags the risky reply and offers a clinician route.
-    expect(screen.getByTestId("screen-sentinel")).toBeInTheDocument();
+    expect(screen.getByTestId("screen-ask")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("topic-fever"));
+
+    expect(screen.getByTestId("screen-response")).toBeInTheDocument();
     await act(async () => {
       await vi.advanceTimersByTimeAsync(SENTINEL_TIMING.interventionAt + 10);
     });
-    expect(screen.getByTestId("intervention-card")).toBeInTheDocument();
+    expect(screen.getByTestId("guide-title")).toHaveTextContent(GUIDE_BY_AGE.infant.title);
     fireEvent.click(screen.getByTestId("talk-to-nurse"));
 
-    // 4. Mocked nurse chat runs to completion.
-    expect(screen.getByTestId("screen-nurse")).toBeInTheDocument();
+    expect(screen.getByTestId("screen-clinicianChoice")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("choose-chat"));
+
+    expect(screen.getByTestId("screen-nurseChat")).toBeInTheDocument();
     await act(async () => {
       await vi.advanceTimersByTimeAsync(totalNurseScriptDuration() + 20);
     });
-    expect(screen.getByTestId("nurse-footer")).toBeInTheDocument();
-    fireEvent.click(screen.getByTestId("see-guide"));
+    fireEvent.click(screen.getByTestId("nurse-done"));
 
-    // 5. Age-adaptive content card matches the age chosen in step 1 (toddler).
-    expect(screen.getByTestId("screen-content")).toBeInTheDocument();
-    expect(screen.getByTestId("guide-title")).toHaveTextContent(GUIDE_BY_AGE.toddler.title);
+    expect(screen.getByTestId("screen-home")).toBeInTheDocument();
   });
 
-  it("restart returns to the profile screen with no age carried over, and re-runs the sentinel sequence", async () => {
+  it("takes the video call path through to a connected mocked call", async () => {
     render(<KinPrototype />);
+    addChild("Maya", "draft-age-chip-toddler");
+    fireEvent.click(screen.getByTestId("onboarding-continue"));
+    fireEvent.click(screen.getByTestId(/select-child-/));
+    fireEvent.click(screen.getByTestId("topic-sleep"));
 
-    fireEvent.click(screen.getByTestId("age-chip-newborn"));
-    fireEvent.click(screen.getByTestId("profile-continue"));
-    fireEvent.click(screen.getByTestId("suggestion-chip"));
-    expect(screen.getByTestId("screen-sentinel")).toBeInTheDocument();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(SENTINEL_TIMING.interventionAt + 10);
+    });
+    fireEvent.click(screen.getByTestId("satisfaction-no"));
+
+    expect(screen.getByTestId("screen-clinicianChoice")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("choose-video"));
+
+    expect(screen.getByTestId("screen-videoCall")).toBeInTheDocument();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(VIDEO_CALL_TIMING.connectingFor + 10);
+    });
+    expect(screen.getByText("Nurse Aanya")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("end-call"));
+    expect(screen.getByTestId("screen-home")).toBeInTheDocument();
+  });
+
+  it("lets a satisfied parent return home without ever escalating", async () => {
+    render(<KinPrototype />);
+    addChild("Liam", "draft-age-chip-infant");
+    fireEvent.click(screen.getByTestId("onboarding-continue"));
+    fireEvent.click(screen.getByTestId(/select-child-/));
+    fireEvent.click(screen.getByTestId("topic-fever"));
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(SENTINEL_TIMING.interventionAt + 10);
+    });
+    fireEvent.click(screen.getByTestId("satisfaction-yes"));
+    fireEvent.click(screen.getByTestId("back-to-home"));
+
+    expect(screen.getByTestId("screen-home")).toBeInTheDocument();
+  });
+
+  it("opens and dismisses the local outbreak alert from the home screen", () => {
+    render(<KinPrototype />);
+    addChild("Liam", "draft-age-chip-infant");
+    fireEvent.click(screen.getByTestId("onboarding-continue"));
+
+    fireEvent.click(screen.getByTestId("outbreak-banner"));
+    expect(screen.getByTestId("screen-outbreak")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("outbreak-back"));
+    expect(screen.getByTestId("screen-home")).toBeInTheDocument();
+  });
+
+  it("supports multiple children and routes each to their own age-matched guide", async () => {
+    render(<KinPrototype />);
+    addChild("Liam", "draft-age-chip-newborn");
+    addChild("Maya", "draft-age-chip-school");
+    fireEvent.click(screen.getByTestId("onboarding-continue"));
+
+    expect(screen.getByText("Liam")).toBeInTheDocument();
+    expect(screen.getByText("Maya")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("Maya"));
+    expect(screen.getByTestId("screen-ask")).toHaveTextContent("Maya");
+
+    fireEvent.click(screen.getByTestId("topic-fever"));
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(SENTINEL_TIMING.interventionAt + 10);
+    });
+    expect(screen.getByTestId("guide-title")).toHaveTextContent(GUIDE_BY_AGE.school.title);
+  });
+
+  it("restart clears children and returns to onboarding", () => {
+    render(<KinPrototype />);
+    addChild("Liam", "draft-age-chip-infant");
+    fireEvent.click(screen.getByTestId("onboarding-continue"));
+    expect(screen.getByTestId("screen-home")).toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId("restart-btn"));
 
-    expect(screen.getByTestId("screen-profile")).toBeInTheDocument();
-    expect(screen.getByTestId("age-chip-newborn")).toHaveAttribute("aria-pressed", "false");
-    expect(screen.getByTestId("profile-continue")).toBeDisabled();
+    expect(screen.getByTestId("screen-onboarding")).toBeInTheDocument();
+    expect(screen.getByTestId("onboarding-continue")).toBeDisabled();
   });
 
-  it("never lets an unapproved/risky reply reach the clinician hand-off screen", async () => {
+  it("never lets the risky reply text survive past the response screen", async () => {
     render(<KinPrototype />);
-
-    fireEvent.click(screen.getByTestId("age-chip-infant"));
-    fireEvent.click(screen.getByTestId("profile-continue"));
-    fireEvent.click(screen.getByTestId("suggestion-chip"));
+    addChild("Liam", "draft-age-chip-infant");
+    fireEvent.click(screen.getByTestId("onboarding-continue"));
+    fireEvent.click(screen.getByTestId(/select-child-/));
+    fireEvent.click(screen.getByTestId("topic-fever"));
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(SENTINEL_TIMING.interventionAt + 10);
     });
     fireEvent.click(screen.getByTestId("talk-to-nurse"));
+    fireEvent.click(screen.getByTestId("choose-chat"));
 
-    // The risky reply text must never appear once we've moved past the sentinel screen.
     expect(screen.queryByText(/half an aspirin/i)).not.toBeInTheDocument();
   });
 });

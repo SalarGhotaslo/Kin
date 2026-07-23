@@ -21,13 +21,13 @@ describe("NurseScreen", () => {
   });
 
   it("starts with an empty chat and no footer CTA", () => {
-    render(<NurseScreen onSeeGuide={() => {}} />);
+    render(<NurseScreen onDone={() => {}} />);
     expect(screen.queryByTestId(/^chat-bubble-/)).not.toBeInTheDocument();
     expect(screen.queryByTestId("nurse-footer")).not.toBeInTheDocument();
   });
 
   it("shows a typing indicator before the nurse's first message appears", async () => {
-    render(<NurseScreen onSeeGuide={() => {}} />);
+    render(<NurseScreen onDone={() => {}} />);
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(CHAT_TIMING.initialDelay + 10);
@@ -42,7 +42,7 @@ describe("NurseScreen", () => {
   });
 
   it("renders the full scripted conversation in order and reveals the footer CTA once it's done", async () => {
-    render(<NurseScreen onSeeGuide={() => {}} />);
+    render(<NurseScreen onDone={() => {}} />);
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(totalScriptDuration() + 20);
@@ -53,22 +53,21 @@ describe("NurseScreen", () => {
     expect(nurseBubbles).toHaveLength(NURSE_SCRIPT.filter((m) => m.from === "nurse").length);
     expect(parentBubbles).toHaveLength(NURSE_SCRIPT.filter((m) => m.from === "parent").length);
 
-    // Never recommends aspirin for infants.
     const allText = [...nurseBubbles, ...parentBubbles].map((b) => b.textContent).join(" ");
     expect(allText).toMatch(/never aspirin/i);
 
     expect(screen.getByTestId("nurse-footer")).toBeInTheDocument();
   });
 
-  it("calls onSeeGuide when the footer CTA is clicked", async () => {
-    const onSeeGuide = vi.fn();
-    render(<NurseScreen onSeeGuide={onSeeGuide} />);
+  it("calls onDone when the footer CTA is clicked", async () => {
+    const onDone = vi.fn();
+    render(<NurseScreen onDone={onDone} />);
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(totalScriptDuration() + 20);
     });
 
-    fireEvent.click(screen.getByTestId("see-guide"));
-    expect(onSeeGuide).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByTestId("nurse-done"));
+    expect(onDone).toHaveBeenCalledTimes(1);
   });
 });
