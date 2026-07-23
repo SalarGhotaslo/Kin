@@ -1,15 +1,35 @@
 export type AgeId = "newborn" | "infant" | "toddler" | "preschool" | "school";
 
-export type Screen = "profile" | "feed" | "sentinel" | "nurse" | "content";
+export type Screen =
+  | "onboarding"
+  | "home"
+  | "outbreak"
+  | "ask"
+  | "response"
+  | "clinicianChoice"
+  | "nurseChat"
+  | "videoCall";
 
-export const SCREENS: Screen[] = ["profile", "feed", "sentinel", "nurse", "content"];
+export const SCREENS: Screen[] = [
+  "onboarding",
+  "home",
+  "outbreak",
+  "ask",
+  "response",
+  "clinicianChoice",
+  "nurseChat",
+  "videoCall",
+];
 
 export const CLOCK_BY_SCREEN: Record<Screen, string> = {
-  profile: "2:47",
-  feed: "2:47",
-  sentinel: "2:49",
-  nurse: "2:52",
-  content: "3:04",
+  onboarding: "2:47",
+  home: "2:48",
+  outbreak: "2:48",
+  ask: "2:50",
+  response: "2:53",
+  clinicianChoice: "2:58",
+  nurseChat: "3:00",
+  videoCall: "3:00",
 };
 
 export interface AgeOption {
@@ -25,6 +45,63 @@ export const AGE_OPTIONS: AgeOption[] = [
   { id: "preschool", label: "Preschool", sub: "3–5 years" },
   { id: "school", label: "School-age", sub: "5+ years" },
 ];
+
+/** A child added during onboarding. Session-only — nothing here is persisted to an account. */
+export interface Child {
+  id: string;
+  name: string;
+  age: AgeId;
+}
+
+export function createChild(name: string, age: AgeId): Child {
+  const trimmed = name.trim();
+  return { id: `${age}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, name: trimmed, age };
+}
+
+export const PARENT_AGE_BANDS = ["Under 20", "20–29", "30–39", "40–49", "50+", "Prefer not to say"] as const;
+export type ParentAgeBand = (typeof PARENT_AGE_BANDS)[number];
+
+export const RELATIONSHIP_STATUSES = ["Prefer not to say", "Partnered", "Single", "Co-parenting"] as const;
+export type RelationshipStatus = (typeof RELATIONSHIP_STATUSES)[number];
+
+export const ETHNIC_BACKGROUNDS = [
+  "Prefer not to say",
+  "White / European",
+  "Black / African / Caribbean",
+  "South Asian",
+  "East or Southeast Asian",
+  "Middle Eastern / North African",
+  "Mixed / multiple ethnic groups",
+  "Other",
+] as const;
+export type EthnicBackground = (typeof ETHNIC_BACKGROUNDS)[number];
+
+export interface LanguageOption {
+  code: string;
+  label: string;
+}
+
+export const LANGUAGE_OPTIONS: LanguageOption[] = [
+  { code: "en", label: "English" },
+  { code: "es", label: "Español" },
+  { code: "pt", label: "Português" },
+  { code: "pl", label: "Polski" },
+  { code: "ur", label: "اردو" },
+];
+
+export interface ParentProfile {
+  parentAgeBand: ParentAgeBand;
+  relationshipStatus: RelationshipStatus;
+  ethnicBackground: EthnicBackground;
+  languageCode: string;
+}
+
+export const DEFAULT_PARENT_PROFILE: ParentProfile = {
+  parentAgeBand: "Prefer not to say",
+  relationshipStatus: "Prefer not to say",
+  ethnicBackground: "Prefer not to say",
+  languageCode: "en",
+};
 
 export interface Guide {
   title: string;
@@ -76,6 +153,19 @@ export function normalizePostText(raw: string): string {
   return trimmed.length > 0 ? trimmed : DEFAULT_SUGGESTED_QUESTION;
 }
 
+export interface TopicSuggestion {
+  id: string;
+  label: string;
+  question: string;
+}
+
+export const TOPIC_SUGGESTIONS: TopicSuggestion[] = [
+  { id: "fever", label: "Fever", question: DEFAULT_SUGGESTED_QUESTION },
+  { id: "sleep", label: "Sleep", question: "My toddler keeps waking up at night, is that normal?" },
+  { id: "feeding", label: "Feeding", question: "My baby is refusing feeds today, should I be worried?" },
+  { id: "behaviour", label: "Behaviour", question: "My child has started having big tantrums, how do I handle it?" },
+];
+
 export type NurseMessage = { from: "nurse" | "parent"; text: string };
 
 export const NURSE_SCRIPT: NurseMessage[] = [
@@ -110,7 +200,7 @@ export const FLAG_REASON =
 export const WHY_FLAGGED_DETAIL =
   "Kin's Sentinel model classifies community replies for unverified or dangerous medical advice in real time. Aspirin in children is a known, well-documented risk — this reply matched that pattern with high confidence and was hidden before most members saw it.";
 
-/** Sentinel sequence timing, in ms from the moment the sentinel screen is shown. */
+/** Sentinel sequence timing, in ms from the moment the response screen is shown. */
 export const SENTINEL_TIMING = {
   safeReplyAt: 900,
   riskyReplyRevealAt: 1900,
@@ -125,4 +215,26 @@ export const CHAT_TIMING = {
   parentReadDelay: 700,
   initialDelay: 400,
   footerDelayAfterLast: 200,
+} as const;
+
+export type Satisfaction = "yes" | "partially" | "no";
+
+export type ClinicianMode = "chat" | "video";
+
+/** Mocked local-outbreak alert shown on the home screen. */
+export const OUTBREAK_ALERT = {
+  headline: "Chickenpox cases rising in South London",
+  summary: "Local nurseries have reported a spike this week. Tap for what to watch for and when to keep your child home.",
+  detailTitle: "Chickenpox: what to do right now",
+  bullets: [
+    "Look for itchy, fluid-filled spots, usually starting on the chest, back or face.",
+    "Keep your child home until all spots have crusted over — typically 5 days after they first appear.",
+    "Cool baths, loose cotton clothing and calamine lotion help with itching; avoid ibuprofen unless a clinician advises it.",
+    "Contact a clinician urgently if your child is under 4 weeks old, pregnant, immunocompromised, or the rash spreads to the eyes.",
+  ],
+} as const;
+
+/** Mocked video-call connection timing, in ms. */
+export const VIDEO_CALL_TIMING = {
+  connectingFor: 2200,
 } as const;

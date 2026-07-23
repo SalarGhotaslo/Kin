@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { CHAT_TIMING, NURSE_SCRIPT, type NurseMessage } from "@/lib/kinFlow";
 
 export interface NurseScreenProps {
-  onSeeGuide: () => void;
+  onDone: () => void;
 }
 
 type ChatEntry = { kind: "message"; message: NurseMessage } | { kind: "typing" };
 
-export default function NurseScreen({ onSeeGuide }: NurseScreenProps) {
+export default function NurseScreen({ onDone }: NurseScreenProps) {
   const [entries, setEntries] = useState<ChatEntry[]>([]);
   const [footerVisible, setFooterVisible] = useState(false);
 
@@ -50,24 +50,27 @@ export default function NurseScreen({ onSeeGuide }: NurseScreenProps) {
   }, []);
 
   return (
-    <section className="phone-screen" id="screen-nurse" data-testid="screen-nurse">
+    <section className="phone-screen" id="screen-nurse" data-testid="screen-nurseChat" tabIndex={-1} aria-label="Nurse chat">
       <div className="nurse-header">
-        <span className="avatar pro">RN</span>
+        <span className="avatar pro" aria-hidden="true">
+          RN
+        </span>
         <div>
-          <div className="nurse-name">Nurse Aanya · RN</div>
+          <h1 className="nurse-name">Nurse Aanya · RN</h1>
           <div className="nurse-status">
-            <span className="live-dot" />
+            <span className="live-dot" aria-hidden="true" />
             Online now
           </div>
         </div>
       </div>
-      <div className="screen-scroll" data-testid="nurse-chat">
+      <div className="screen-scroll" data-testid="nurse-chat" aria-live="polite">
         {entries.map((entry, i) =>
           entry.kind === "typing" ? (
             <div className="typing-indicator" key={`typing-${i}`} data-testid="typing-indicator">
-              <span />
-              <span />
-              <span />
+              <span aria-hidden="true" />
+              <span aria-hidden="true" />
+              <span aria-hidden="true" />
+              <span className="sr-only">Nurse is typing…</span>
             </div>
           ) : (
             <div className={`chat-bubble ${entry.message.from}`} key={i} data-testid={`chat-bubble-${entry.message.from}`}>
@@ -78,8 +81,8 @@ export default function NurseScreen({ onSeeGuide }: NurseScreenProps) {
       </div>
       {footerVisible && (
         <div className="screen-footer" data-testid="nurse-footer">
-          <button type="button" className="primary-btn" data-testid="see-guide" onClick={onSeeGuide}>
-            See a guide for this age
+          <button type="button" className="primary-btn" data-testid="nurse-done" onClick={onDone}>
+            Done — back to home
           </button>
         </div>
       )}
