@@ -130,7 +130,7 @@ export default function HomeTab({
           <div className="section-head">
             <h2>Daily Insights</h2>
           </div>
-          <div className="insight-scroll" data-testid="daily-insights">
+          <div className="insight-scroll" data-testid="daily-insights" tabIndex={0} role="region" aria-label="Daily insights, scrollable">
             {DAILY_INSIGHTS.map((insight) => (
               <article className="insight-card" key={insight.id}>
                 <div className="insight-image" aria-hidden="true">
@@ -158,7 +158,14 @@ export default function HomeTab({
               <p style={{ margin: "0 0 4px", fontSize: "0.85rem" }}>
                 {milestoneChild.name} is {MILESTONE.percentage}% of the way to her {MILESTONE.goalLabel}!
               </p>
-              <div className="milestone-track" role="progressbar" aria-valuenow={MILESTONE.percentage} aria-valuemin={0} aria-valuemax={100}>
+              <div
+                className="milestone-track"
+                role="progressbar"
+                aria-valuenow={MILESTONE.percentage}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`${milestoneChild.name}'s ${MILESTONE.goalLabel} progress`}
+              >
                 <div className="milestone-fill" style={{ width: `${MILESTONE.percentage}%` }} />
               </div>
               <button type="button" className="link-btn" style={{ background: "none", border: "none", color: "var(--primary)", fontWeight: 700, fontSize: "0.8rem", cursor: "pointer", padding: 0 }}>

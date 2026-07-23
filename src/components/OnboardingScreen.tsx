@@ -46,9 +46,8 @@ export default function OnboardingScreen({
   return (
     <section className="app-view" id="screen-onboarding" data-testid="screen-onboarding" tabIndex={-1} aria-label="Set up your session">
       <div className="onboarding-header">
-        <span className="top-bar-title">Kin</span>
-        <h1>Before we start</h1>
-        <p>Just for this session — nothing here creates an account or is saved.</p>
+        <span className="top-bar-title"></span>
+        <h1>Kin</h1>
       </div>
 
       <div className="view-content">

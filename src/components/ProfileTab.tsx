@@ -188,6 +188,12 @@ export default function ProfileTab({
             Request Data Deletion
           </button>
         </section>
+
+        <section style={{ borderTop: "1px solid var(--line)", paddingTop: 16 }}>
+          <button type="button" className="btn btn-ghost btn-block btn-sm" data-testid="restart-btn" onClick={onRestart}>
+            Restart prototype session
+          </button>
+        </section>
       </div>
     </section>
   );

@@ -17,6 +17,7 @@ function setup(overrides: Partial<React.ComponentProps<typeof ProfileTab>> = {})
     onRequestDeletion: vi.fn(),
     onOpenMenu: vi.fn(),
     onOpenNotifications: vi.fn(),
+    onRestart: vi.fn(),
     ...overrides,
   };
   render(<ProfileTab {...props} />);
@@ -59,6 +60,7 @@ describe("ProfileTab", () => {
         onRequestDeletion={() => {}}
         onOpenMenu={() => {}}
         onOpenNotifications={() => {}}
+        onRestart={() => {}}
       />
     );
     expect(screen.getByText(/nothing saved yet/i)).toBeInTheDocument();
@@ -76,6 +78,7 @@ describe("ProfileTab", () => {
         onRequestDeletion={() => {}}
         onOpenMenu={() => {}}
         onOpenNotifications={() => {}}
+        onRestart={() => {}}
       />
     );
     expect(screen.getByText(first.title)).toBeInTheDocument();

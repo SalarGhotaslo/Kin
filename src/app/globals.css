@@ -1,28 +1,37 @@
 :root {
   color-scheme: light dark;
 
-  /* ---- palette tokens (light) — text/background pairs verified >=4.5:1,
-     UI-boundary pairs (borders) verified >=3:1 ---- */
-  --bg: #F5F5FB;
+  /* ---- brand palette, exact per design spec sheet ----
+     Primary #15AFB9 (teal), Secondary #3C0087 (deep purple),
+     Tertiary #F4A261 (orange), Neutral #EEEEEE.
+     Primary and Tertiary are both too light to host white text/icons
+     (verified <3:1) — they always pair with --on-bright (dark, fixed
+     across themes). Secondary stays dark enough in both themes to
+     always pair with --on-deep (white, fixed). All pairs verified
+     >=4.5:1 for text, >=3:1 for UI boundaries. ---- */
+  --bg: #EEEEEE;
   --surface: #FFFFFF;
-  --surface-sunken: #F1F1F8;
+  --surface-sunken: #EEEEEE;
   --ink: #1F2333;
-  --ink-soft: #565B6E;
-  --ink-faint: #4F5566;
-  --line: #8285A0;
+  --ink-soft: #4B5163;
+  --ink-faint: #5B6175;
+  --line: #7D8299;
 
-  --primary: #5D5FEF; /* indigo — professional source, clinician actions, chat (parent) */
-  --primary-light: #8B8DF5;
-  --primary-soft: #E7E7FC;
-  --primary-ink: #3A3AC0;
+  --on-bright: #14161C; /* content on primary/tertiary fills, both themes */
+  --on-deep: #FFFFFF; /* content on secondary fills, both themes */
 
-  --secondary: #0B655D; /* teal — positive actions, active nav, progress */
-  --secondary-soft: #D9F5F0;
-  --secondary-ink: #0B655D;
+  --primary: #15AFB9; /* teal — primary actions, active nav, professional tag */
+  --primary-soft: #DFF5F6;
+  --primary-ink: #0B5960;
 
-  --tertiary: #C74A1B; /* coral — community wisdom, CTAs, alerts */
-  --tertiary-soft: #FFE8E0;
-  --tertiary-ink: #B24A1D;
+  --secondary: #3C0087; /* deep purple — header gradient, clinician chat bubble */
+  --secondary-light: #6A2FB0;
+  --secondary-soft: #EEE1FA;
+  --secondary-ink: #3C0087;
+
+  --tertiary: #F4A261; /* orange — community wisdom, CTAs, alerts, FAB */
+  --tertiary-soft: #FDECDB;
+  --tertiary-ink: #8A4D14;
 
   --danger: #D1402F; /* Sentinel flag / destructive */
   --danger-soft: #FCE1DC;
@@ -35,26 +44,26 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #12131C;
-    --surface: #1B1D2A;
-    --surface-sunken: #20222F;
-    --ink: #EDEDF5;
-    --ink-soft: #B7BACB;
-    --ink-faint: #9296AB;
-    --line: #666A85;
+    --bg: #14161C;
+    --surface: #1E212A;
+    --surface-sunken: #252831;
+    --ink: #ECEDF2;
+    --ink-soft: #B7BBC9;
+    --ink-faint: #9BA0B0;
+    --line: #666B80;
 
-    --primary: #9496F7;
-    --primary-light: #B7B8FA;
-    --primary-soft: #2A2A52;
-    --primary-ink: #C7C8FB;
+    --primary: #3FD1C9;
+    --primary-soft: #0F3A3A;
+    --primary-ink: #8FE9E2;
 
-    --secondary: #2FD1BE;
-    --secondary-soft: #123832;
-    --secondary-ink: #7FEADC;
+    --secondary: #6E2BD1;
+    --secondary-light: #8E52E0;
+    --secondary-soft: #2A1A4A;
+    --secondary-ink: #C9B3FA;
 
-    --tertiary: #F0916A;
-    --tertiary-soft: #3D2417;
-    --tertiary-ink: #F8BC9E;
+    --tertiary: #F4A261;
+    --tertiary-soft: #3A2617;
+    --tertiary-ink: #FBCB9E;
 
     --danger: #F0715D;
     --danger-soft: #3A1712;
@@ -63,26 +72,26 @@
 }
 
 :root[data-theme="dark"] {
-  --bg: #12131C;
-  --surface: #1B1D2A;
-  --surface-sunken: #20222F;
-  --ink: #EDEDF5;
-  --ink-soft: #B7BACB;
-  --ink-faint: #9296AB;
-  --line: #666A85;
+  --bg: #14161C;
+  --surface: #1E212A;
+  --surface-sunken: #252831;
+  --ink: #ECEDF2;
+  --ink-soft: #B7BBC9;
+  --ink-faint: #9BA0B0;
+  --line: #666B80;
 
-  --primary: #9496F7;
-  --primary-light: #B7B8FA;
-  --primary-soft: #2A2A52;
-  --primary-ink: #C7C8FB;
+  --primary: #3FD1C9;
+  --primary-soft: #0F3A3A;
+  --primary-ink: #8FE9E2;
 
-  --secondary: #2FD1BE;
-  --secondary-soft: #123832;
-  --secondary-ink: #7FEADC;
+  --secondary: #6E2BD1;
+  --secondary-light: #8E52E0;
+  --secondary-soft: #2A1A4A;
+  --secondary-ink: #C9B3FA;
 
-  --tertiary: #F0916A;
-  --tertiary-soft: #3D2417;
-  --tertiary-ink: #F8BC9E;
+  --tertiary: #F4A261;
+  --tertiary-soft: #3A2617;
+  --tertiary-ink: #FBCB9E;
 
   --danger: #F0715D;
   --danger-soft: #3A1712;
@@ -90,30 +99,33 @@
 }
 
 :root[data-theme="light"] {
-  --bg: #F5F5FB;
+  --bg: #EEEEEE;
   --surface: #FFFFFF;
-  --surface-sunken: #F1F1F8;
+  --surface-sunken: #EEEEEE;
   --ink: #1F2333;
-  --ink-soft: #565B6E;
-  --ink-faint: #4F5566;
-  --line: #8285A0;
+  --ink-soft: #4B5163;
+  --ink-faint: #5B6175;
+  --line: #7D8299;
 
-  --primary: #5D5FEF;
-  --primary-light: #8B8DF5;
-  --primary-soft: #E7E7FC;
-  --primary-ink: #3A3AC0;
+  --primary: #15AFB9;
+  --primary-soft: #DFF5F6;
+  --primary-ink: #0B5960;
 
-  --secondary: #0B655D;
-  --secondary-soft: #D9F5F0;
-  --secondary-ink: #0B655D;
+  --secondary: #3C0087;
+  --secondary-light: #6A2FB0;
+  --secondary-soft: #EEE1FA;
+  --secondary-ink: #3C0087;
 
-  --tertiary: #C74A1B;
-  --tertiary-soft: #FFE8E0;
-  --tertiary-ink: #B24A1D;
+  --tertiary: #F4A261;
+  --tertiary-soft: #FDECDB;
+  --tertiary-ink: #8A4D14;
 
   --danger: #D1402F;
   --danger-soft: #FCE1DC;
   --danger-ink: #98261A;
+
+  --on-bright: #14161C;
+  --on-deep: #FFFFFF;
 }
 
 * {
@@ -214,7 +226,7 @@ a {
 .top-bar {
   flex: none;
   padding: 18px 20px 28px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
   color: #fff;
   border-radius: 0 0 26px 26px;
 }
@@ -346,7 +358,7 @@ a {
 .section-head button.link-btn {
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-ink);
   background: none;
   border: none;
   cursor: pointer;
@@ -437,7 +449,7 @@ a {
 }
 .btn-primary {
   background: var(--primary);
-  color: #fff;
+  color: var(--on-bright);
 }
 .btn-primary:hover {
   filter: brightness(0.94);
@@ -450,7 +462,7 @@ a {
 }
 .btn-tertiary {
   background: var(--tertiary);
-  color: #fff;
+  color: var(--on-bright);
 }
 .btn-tertiary:hover {
   filter: brightness(0.94);
@@ -467,7 +479,7 @@ a {
   border-color: var(--line);
 }
 .btn-outline:hover {
-  border-color: var(--primary);
+  border-color: var(--primary-ink);
 }
 .btn-outline.selected {
   background: var(--secondary-soft);
@@ -535,7 +547,7 @@ textarea {
 /* ================= onboarding ================= */
 .onboarding-header {
   padding: 28px 20px 20px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
   color: #fff;
   border-radius: 0 0 26px 26px;
 }
@@ -734,13 +746,14 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
 }
 .quick-action-icon.secondary {
   background: var(--secondary);
+  color: var(--on-deep);
 }
 .quick-action-icon.primary {
   background: var(--primary);
+  color: var(--on-bright);
 }
 
 .activity-card p {
@@ -773,7 +786,7 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary);
+  color: var(--primary-ink);
 }
 .insight-body {
   padding: 10px 12px 12px;
@@ -810,9 +823,9 @@ textarea {
   height: 54px;
   border-radius: 50%;
   background: var(--tertiary);
-  color: #fff;
+  color: var(--on-bright);
   border: none;
-  box-shadow: 0 14px 30px -10px rgba(199, 74, 27, 0.6);
+  box-shadow: 0 14px 30px -10px rgba(180, 110, 40, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -828,7 +841,7 @@ textarea {
   max-width: 84%;
   margin-left: auto;
   background: var(--primary);
-  color: #fff;
+  color: var(--on-bright);
   padding: 12px 15px;
   border-radius: var(--radius-md);
   border-bottom-right-radius: 4px;
@@ -974,11 +987,11 @@ textarea {
   justify-content: center;
   border: 1px solid var(--line);
   background: var(--surface);
-  color: var(--primary);
+  color: var(--primary-ink);
   cursor: pointer;
 }
 .icon-btn:hover {
-  border-color: var(--primary);
+  border-color: var(--primary-ink);
 }
 
 .media-card {
@@ -993,7 +1006,7 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary);
+  color: var(--primary-ink);
   position: relative;
 }
 .media-thumb .play-badge {
@@ -1004,7 +1017,7 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary);
+  color: var(--primary-ink);
 }
 .media-body {
   padding: 12px 14px;
@@ -1034,7 +1047,7 @@ textarea {
 .reply-link {
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-ink);
   background: none;
   border: none;
   cursor: pointer;
@@ -1081,7 +1094,7 @@ textarea {
   border-radius: 50%;
   border: none;
   background: var(--primary);
-  color: #fff;
+  color: var(--on-bright);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1112,7 +1125,7 @@ textarea {
   cursor: pointer;
 }
 .topic-chip:hover {
-  border-color: var(--primary);
+  border-color: var(--primary-ink);
 }
 
 .empty-ask-state {
@@ -1277,7 +1290,7 @@ textarea {
 .filter-chip.active {
   background: var(--primary);
   border-color: var(--primary);
-  color: #fff;
+  color: var(--on-bright);
 }
 
 .article-card h3 {
@@ -1326,7 +1339,7 @@ textarea {
 /* ================= profile tab ================= */
 .profile-header {
   padding: 24px 20px 28px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
   color: #fff;
   border-radius: 0 0 26px 26px;
 }
@@ -1381,8 +1394,10 @@ textarea {
 .stage-card span {
   display: block;
   font-size: 0.74rem;
-  color: inherit;
-  opacity: 0.75;
+  color: var(--ink-faint);
+}
+.stage-card.present span {
+  color: var(--secondary-ink);
 }
 
 .engine-badge {

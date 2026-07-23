@@ -102,6 +102,8 @@ describe("AppShell (feature test): onboarding through the tabbed app", () => {
     fireEvent.click(screen.getByTestId("nav-ask"));
     fireEvent.click(screen.getByTestId("topic-feeding"));
 
+    // Restart lives in Profile, not as a floating control over real product UI.
+    fireEvent.click(screen.getByTestId("nav-profile"));
     fireEvent.click(screen.getByTestId("restart-btn"));
 
     expect(screen.getByTestId("screen-onboarding")).toBeInTheDocument();

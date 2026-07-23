@@ -25,7 +25,7 @@ test.describe("Accessibility (axe, WCAG 2.1 A/AA)", () => {
     await expectNoViolations(page);
   });
 
-  test("home screen (with outbreak alert) has no violations", async ({ page }) => {
+  test("Home tab (with outbreak alert) has no violations", async ({ page }) => {
     await page.goto("/");
     await completeOnboarding(page);
     await expectNoViolations(page);
@@ -38,55 +38,57 @@ test.describe("Accessibility (axe, WCAG 2.1 A/AA)", () => {
     await expectNoViolations(page);
   });
 
-  test("ask screen has no violations", async ({ page }) => {
+  test("Ask AI empty state has no violations", async ({ page }) => {
     await page.goto("/");
     await completeOnboarding(page);
-    await page.getByTestId(/select-child-/).click();
+    await page.getByTestId("nav-ask").click();
     await expectNoViolations(page);
   });
 
-  test("response screen, including the flagged Intervention Card, has no violations", async ({ page }) => {
+  test("Ask AI response, including the flagged Intervention Card, has no violations", async ({ page }) => {
     await page.goto("/");
     await completeOnboarding(page);
-    await page.getByTestId(/select-child-/).click();
+    await page.getByTestId("nav-ask").click();
     await page.getByTestId("topic-fever").click();
     await page.getByTestId("intervention-card").waitFor({ timeout: 8000 });
     await expectNoViolations(page);
   });
 
-  test("clinician choice screen has no violations", async ({ page }) => {
+  test("clinician chat screen has no violations", async ({ page }) => {
     await page.goto("/");
     await completeOnboarding(page);
-    await page.getByTestId(/select-child-/).click();
+    await page.getByTestId("nav-ask").click();
     await page.getByTestId("topic-fever").click();
     await page.getByTestId("talk-to-nurse").waitFor({ timeout: 8000 });
     await page.getByTestId("talk-to-nurse").click();
-    await expectNoViolations(page);
-  });
-
-  test("nurse chat screen has no violations", async ({ page }) => {
-    await page.goto("/");
-    await completeOnboarding(page);
-    await page.getByTestId(/select-child-/).click();
-    await page.getByTestId("topic-fever").click();
-    await page.getByTestId("talk-to-nurse").waitFor({ timeout: 8000 });
-    await page.getByTestId("talk-to-nurse").click();
-    await page.getByTestId("choose-chat").click();
     await expectNoViolations(page);
   });
 
   test("video call screen has no violations", async ({ page }) => {
     await page.goto("/");
     await completeOnboarding(page);
-    await page.getByTestId(/select-child-/).click();
-    await page.getByTestId("topic-fever").click();
-    await page.getByTestId("talk-to-nurse").waitFor({ timeout: 8000 });
-    await page.getByTestId("talk-to-nurse").click();
-    await page.getByTestId("choose-video").click();
+    await page.getByTestId("nav-ask").click();
+    await page.getByTestId("topic-feeding").click();
+    await page.getByTestId("connect-video-sarah-mitchell").waitFor({ timeout: 8000 });
+    await page.getByTestId("connect-video-sarah-mitchell").click();
     await expectNoViolations(page);
   });
 
-  test("dark theme home screen has no violations", async ({ page }) => {
+  test("Knowledge tab has no violations", async ({ page }) => {
+    await page.goto("/");
+    await completeOnboarding(page);
+    await page.getByTestId("nav-knowledge").click();
+    await expectNoViolations(page);
+  });
+
+  test("Profile tab has no violations", async ({ page }) => {
+    await page.goto("/");
+    await completeOnboarding(page);
+    await page.getByTestId("nav-profile").click();
+    await expectNoViolations(page);
+  });
+
+  test("dark theme Home tab has no violations", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "dark", reducedMotion: "reduce" });
     await page.goto("/");
     await completeOnboarding(page);

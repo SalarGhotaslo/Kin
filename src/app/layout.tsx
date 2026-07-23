@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Manrope } from "next/font/google";
+import { Be_Vietnam_Pro } from "next/font/google";
 import "./globals.css";
 
-const manrope = Manrope({
+const beVietnamPro = Be_Vietnam_Pro({
   variable: "--font-body",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
@@ -19,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={manrope.variable}>
+    <html lang="en" className={beVietnamPro.variable}>
       <body>{children}</body>
     </html>
   );
