@@ -33,14 +33,18 @@ The visual design was redone to match reference mockups the stakeholder supplied
 
 ## Design system
 
+Colors are **exact values from the stakeholder's design spec sheet**, not eyeballed from screenshots — `--primary: #15AFB9` (teal), `--secondary: #3C0087` (deep purple), `--tertiary: #F4A261` (orange), neutral `#EEEEEE`. Don't adjust these base hex values without a new spec; adjust only the derived `-soft`/`-ink` tint/shade tokens if a contrast issue comes up.
+
 Tokens in `src/app/globals.css`, all **contrast-audited** (WCAG AA — ≥4.5:1 text, ≥3:1 UI boundaries) in both themes via the automated axe suite:
-- `--primary` (indigo/purple — gradient headers, professional-source tag, parent chat bubbles, clinician actions)
-- `--secondary` (teal — active nav, positive actions/progress)
-- `--tertiary` (coral — community-wisdom tag, Save Changes, outbreak alert, FAB)
+- `--primary` (teal — primary buttons, active nav, professional-source tag, links/icons via `--primary-ink`)
+- `--secondary` (deep purple — gradient headers, parent/user chat bubbles, clinician actions; `--secondary-light` is the gradient's second stop)
+- `--tertiary` (orange — community-wisdom tag, Save Changes, outbreak alert, FAB)
 - `--danger` (Sentinel flag / destructive)
 - neutrals `--bg` / `--surface` / `--surface-sunken` / `--ink(-soft/-faint)` / `--line`
 
-Typeface: Manrope only (`next/font/google`, `src/app/layout.tsx`) — one clean friendly sans for both display and body, matching the reference screens (no serif, no mono).
+**`--primary` and `--tertiary` are both too light to host white text or icons** (verified <3:1, in some cases as low as ~2:1) — anything filled solid with either of them (`.btn-primary`, `.btn-tertiary`, `.fab`, `.chat-bubble-user`, `.quick-action-icon.primary`, `.composer-send`, `.filter-chip.active`) uses `--on-bright` (a fixed dark color, same in both themes) for its content, never `#fff`/`white`. `--secondary` stays dark enough in both themes to always pair with `--on-deep` (fixed white). When adding a new solid-fill element in one of these three colors, use `--on-bright` (primary/tertiary) or `--on-deep` (secondary) for its text/icon — don't hardcode white or reuse `--ink`, which flips per theme and will silently break in dark mode.
+
+Typeface: Be Vietnam Pro only (`next/font/google`, `src/app/layout.tsx`), per the spec sheet — one family for headline/body/label, no serif, no mono.
 
 **Layout**: `.app-frame` is a fixed-height (`height: 100vh` mobile / `96vh` desktop) container — this matters: it must be a hard height, not `min-height`, or the internal `.app-view` scroll region (`flex:1; overflow-y:auto`) never actually engages and the whole page scrolls instead, which breaks the floating bottom-nav/FAB/toast (all `position: absolute` relative to `.app-frame`, deliberately *not* `position: fixed` relative to the viewport, since fixed positioning combined with a viewport-width-dependent `calc()` broke on any window size other than the one it was tuned for).
 

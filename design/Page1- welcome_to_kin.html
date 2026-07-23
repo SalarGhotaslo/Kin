@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Welcome to Kin | Parent Support</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#ffdbcf",
+                    "secondary-fixed": "#9bf1f1",
+                    "inverse-surface": "#27313c",
+                    "on-tertiary-fixed": "#380c00",
+                    "on-primary-container": "#95bff1",
+                    "trust-indigo": "#1F4E79",
+                    "on-surface-variant": "#42474f",
+                    "mint-tint": "#F0FAFA",
+                    "secondary-fixed-dim": "#7ed5d4",
+                    "on-secondary-container": "#006e6e",
+                    "error-container": "#ffdad6",
+                    "surface-variant": "#d9e3f1",
+                    "on-secondary": "#ffffff",
+                    "warm-coral": "#FF7F50",
+                    "on-primary-fixed-variant": "#184974",
+                    "outline": "#72777f",
+                    "outline-variant": "#c2c7d0",
+                    "on-tertiary-container": "#ffa687",
+                    "tertiary-container": "#8a2b00",
+                    "background": "#f7f9ff",
+                    "inverse-on-surface": "#e8f2ff",
+                    "surface-container-highest": "#d9e3f1",
+                    "on-secondary-fixed": "#002020",
+                    "ice-blue": "#F3F7FB",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed": "#001d35",
+                    "secondary-container": "#98eeee",
+                    "surface-bright": "#f7f9ff",
+                    "surface-dim": "#d1dbe8",
+                    "slate-muted": "#68778D",
+                    "primary-fixed-dim": "#a0cafc",
+                    "on-tertiary-fixed-variant": "#822800",
+                    "primary-fixed": "#d1e4ff",
+                    "on-secondary-fixed-variant": "#004f50",
+                    "surface-tint": "#35618d",
+                    "secondary": "#006a6a",
+                    "primary-container": "#1f4e79",
+                    "on-error-container": "#93000a",
+                    "error": "#ba1a1a",
+                    "surface-container-high": "#dfe9f7",
+                    "surface": "#f7f9ff",
+                    "energetic-teal": "#2E8B8B",
+                    "surface-container-low": "#edf4ff",
+                    "surface-container": "#e4effd",
+                    "on-error": "#ffffff",
+                    "on-surface": "#121d26",
+                    "tertiary": "#641c00",
+                    "primary": "#00375e",
+                    "on-background": "#121d26",
+                    "inverse-primary": "#a0cafc",
+                    "on-primary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "ink": "#1F2933",
+                    "tertiary-fixed-dim": "#ffb59c",
+                    "border-light": "#D7DEE8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "section-gap": "2rem",
+                    "container-padding": "1.25rem",
+                    "stack-tight": "0.5rem",
+                    "element-gap": "1rem",
+                    "max-width": "1100px"
+            },
+            "fontFamily": {
+                    "body-md": ["Be Vietnam Pro"],
+                    "caption": ["Be Vietnam Pro"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-sm": ["Plus Jakarta Sans"],
+                    "body-lg": ["Be Vietnam Pro"],
+                    "label-md": ["Be Vietnam Pro"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "body-md": ["15px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "caption": ["13px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                    "headline-md": ["22px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                    "headline-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "1.55", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.15", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .kinetic-gradient {
+            background: linear-gradient(135deg, #F3F7FB 0%, #F0FAFA 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kinetic-gradient::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(46, 139, 139, 0.05) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .custom-active-shadow {
+            box-shadow: 0 10px 15px -3px rgba(31, 78, 121, 0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col items-center selection:bg-energetic-teal/20">
+<!-- Hero Visual Section -->
+<section class="relative w-full max-w-max-width h-[397px] md:h-[442px] flex flex-col justify-end px-container-padding pb-8 overflow-hidden">
+<!-- Background Animation Wrapper -->
+<div class="absolute inset-0 z-0">
+<div class="w-full h-full bg-cover bg-center" data-alt="A warm and high-energy photography scene of a diverse modern family laughing together in a sun-drenched, airy living room. The image uses a bright light-mode aesthetic with soft teal and coral accents in the decor. High-key natural lighting creates a professional health-tech warmth. The composition is clean and minimalist, emphasizing emotional connection and reliable support." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCIfzpbruR2jDOVkv0dceCoX_hY8SvRKxpdcAc-qnZ5R603i1ihbE6KimEPYo2j-n-8uOtVD8heZXCmHs8B0fVCUcU5ze4u2IGUcj971PCoErwFfGXepPrmJ3IBDTI0CpjtzTtuT0kerrFSPDiuTq_KPuEQk8KCBDpyUyjaIFdhxhvYCz9RfrXbhjr8WrH54OtwR4tZZ9ZEC5aio2xvDyPGWUr8cDjH-Y6STbb-s_heRmnYUZPayYAnFc6q-bZYSz0kJjxFMarVXStq')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
+</div>
+<!-- Brand Identity Container -->
+<div class="relative z-10 flex flex-col gap-2">
+<div class="flex items-center gap-3 mb-2">
+<div class="bg-trust-indigo p-2.5 rounded-xl shadow-lg">
+<span class="material-symbols-outlined text-white text-3xl">family_restroom</span>
+</div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary tracking-tight">Kin</h1>
+</div>
+<p class="font-headline-md text-headline-md text-on-surface max-w-md leading-tight">
+                Empowering your parenting journey with <span class="text-energetic-teal">expert AI</span> and community.
+            </p>
+</div>
+</section>
+<!-- Interactive Onboarding Section -->
+<main class="w-full max-w-max-width flex-1 px-container-padding py-8 flex flex-col gap-6">
+<!-- Action Area -->
+<div class="flex flex-col gap-4">
+<!-- Primary CTA -->
+<button class="w-full h-16 bg-trust-indigo hover:bg-primary transition-all duration-300 rounded-xl flex items-center justify-center gap-3 shadow-md active:scale-[0.98]">
+<span class="text-on-primary font-headline-sm text-headline-sm">Get Started</span>
+<span class="material-symbols-outlined text-on-primary">arrow_forward</span>
+</button>
+<div class="flex items-center gap-4 py-2">
+<div class="flex-1 h-[1px] bg-outline-variant"></div>
+<span class="font-label-md text-label-md text-slate-muted">OR CONTINUE WITH</span>
+<div class="flex-1 h-[1px] bg-outline-variant"></div>
+</div>
+<!-- Social Logins Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+<!-- Google -->
+<button class="flex items-center justify-center gap-3 h-14 border border-border-light bg-surface hover:bg-ice-blue transition-colors rounded-xl font-label-md text-label-md text-on-surface">
+<svg class="w-5 h-5" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+                    Google
+                </button>
+<!-- Phone -->
+<button class="flex items-center justify-center gap-3 h-14 border border-border-light bg-surface hover:bg-ice-blue transition-colors rounded-xl font-label-md text-label-md text-on-surface">
+<span class="material-symbols-outlined text-trust-indigo">smartphone</span>
+                    Phone
+                </button>
+<!-- Email -->
+<button class="flex items-center justify-center gap-3 h-14 border border-border-light bg-surface hover:bg-ice-blue transition-colors rounded-xl font-label-md text-label-md text-on-surface">
+<span class="material-symbols-outlined text-trust-indigo">mail</span>
+                    Email
+                </button>
+</div>
+</div>
+<!-- Value Proposition Cards (Bento Style) -->
+<div class="grid grid-cols-2 gap-3 mt-4">
+<div class="bg-mint-tint border-l-4 border-energetic-teal p-4 rounded-xl flex flex-col gap-2">
+<span class="material-symbols-outlined text-energetic-teal">smart_toy</span>
+<h3 class="font-label-md text-label-md text-on-secondary-container">AI Assistant</h3>
+<p class="font-caption text-caption text-slate-muted">Instant parenting advice based on science.</p>
+</div>
+<div class="bg-tertiary-fixed/30 border-l-4 border-warm-coral p-4 rounded-xl flex flex-col gap-2">
+<span class="material-symbols-outlined text-warm-coral">library_books</span>
+<h3 class="font-label-md text-label-md text-on-tertiary-fixed-variant">Expert Hub</h3>
+<p class="font-caption text-caption text-slate-muted">Curated library for every development stage.</p>
+</div>
+</div>
+<!-- Footer / Legal -->
+<footer class="mt-auto pt-8 pb-4 flex flex-col items-center gap-4 text-center">
+<p class="font-caption text-caption text-slate-muted px-4">
+                By continuing, you agree to our 
+                <a class="text-trust-indigo font-semibold underline underline-offset-2" href="#">Terms of Service</a> 
+                and 
+                <a class="text-trust-indigo font-semibold underline underline-offset-2" href="#">Privacy Policy</a>.
+            </p>
+<div class="flex items-center gap-2 text-slate-muted opacity-50">
+<span class="material-symbols-outlined text-[16px]">verified_user</span>
+<span class="text-xs uppercase tracking-widest font-bold">Secure Multilingual Support</span>
+</div>
+</footer>
+</main>
+<!-- Micro-interaction Script -->
+<script>
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                button.classList.add('scale-95');
+            });
+            button.addEventListener('mouseup', () => {
+                button.classList.remove('scale-95');
+            });
+            button.addEventListener('mouseleave', () => {
+                button.classList.remove('scale-95');
+            });
+        });
+    </script>
+</body></html>
