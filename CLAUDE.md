@@ -2,53 +2,53 @@
 
 ## Repo state
 
-This repo currently contains **planning artifacts only** — no application code has been written yet. All product/technical decisions to date live under `_bmad-output/planning-artifacts/prds/prd-kin-2026-07-23/`:
+This repo is now a working Next.js (App Router, TypeScript) prototype of Kin's flagship walkthrough — not just planning artifacts. The original BMAD planning docs still live under `_bmad-output/planning-artifacts/prds/prd-kin-2026-07-23/` (`prd.md`, `plan.md`, `stories.md`, `addendum.md`, `.memlog.md`) and are useful background on the product's origin and long-term vision, but **the live product direction (given directly by the stakeholder) has superseded parts of that PRD** — see "Where this diverges from the original PRD" below. Treat this file and the actual code as the source of truth for current scope; treat `_bmad-output` as historical/strategic context, not a spec to follow literally.
 
-- `prd.md` — vision, target users, epics, functional requirements, non-goals, success metrics, open questions.
-- `plan.md` — phased delivery sequence across the four epics, with blocking clarifications and fallback discipline.
-- `stories.md` — full user stories and acceptance criteria per epic.
-- `addendum.md` — supplementary detail (build-approach rationale, post-hackathon rollout roadmap) that isn't build scope.
-- `.memlog.md` — chronological decision log from the planning session.
+## What's built
 
-Treat `prd.md` and `stories.md` as the source of truth for scope; `plan.md` for sequencing; `addendum.md` for background/rationale only (explicitly **not** build scope).
+A single-page, fully-mocked interactive prototype (`src/components/KinPrototype.tsx` orchestrates everything) walking through Kin's core safety flow. No real backend, LLM, or clinician integration — everything is scripted/mocked so the flow can be demoed and iterated on before any real integration work starts.
 
-## What Kin is
+### Screen sequence (`src/lib/kinFlow.ts` defines the `Screen` union and drives timing/copy)
 
-A parenting support app: parents get AI-generated answers to parenting questions grounded in community + clinically-reviewed professional content, with safe escalation to a human clinician when the AI can't resolve a concern safely. Positioned as a third option between a crowded ER visit and unmoderated online forums.
+1. **Onboarding** (`OnboardingScreen`) — session-only (nothing persisted to an account). Captures optional parent-level context (age band, relationship status, ethnic background, preferred language) plus a **required** list of one or more children (name + age band). Continue is gated on having at least one child.
+2. **Home** (`HomeScreen`) — "Which child do you want to speak about today?" with a child picker, a language switcher, and a mocked local-outbreak alert banner (e.g. chickenpox in the area) that links to a detail screen.
+3. **Outbreak detail** (`OutbreakDetailScreen`) — guidance bullets for the alert, dismiss back to Home.
+4. **Ask** (`AskScreen`) — "What do you want help with?" for the selected child: topic chips (Fever/Sleep/Feeding/Behaviour) or free text.
+5. **Response** (`ResponseScreen`) — the core mechanic: shows an age-matched suggested article (bookmarkable) *and* a community-reply thread. A safe reply appears, then a risky one (aspirin advice) that Sentinel detects, scans, and replaces with an Intervention Card explaining the flag and offering clinician escalation. Also runs the Satisfaction Check (Yes/Partially/No) — "No" and the Intervention Card's CTA both escalate; "Partially" offers escalation; "Yes" returns home.
+6. **Clinician choice** (`ClinicianChoiceScreen`) — choose Chat or Video call.
+7. **Nurse chat** (`NurseScreen`) — scripted nurse conversation, ends with "Done — back to home".
+8. **Video call** (`VideoCallScreen`) — mocked connecting → connected UI with a simulated remote/self video tile layout, "End call" returns home.
 
-## MVP scope — four epics
+A global **restart** button (top of the stage) resets all state back to onboarding.
 
-1. **Epic 1 — User Registration & Trust Foundation**: secure account creation, profile personalisation (child age range required; everything else optional), consent management.
-2. **Epic 2 — AI Parenting Assistant** (core MVP experience): ask a question → source-attributed grounded answer → follow-up → satisfaction check (Yes/Partially/No) → clinician redirect on low confidence/high risk/dissatisfaction → structured handover summary to the clinician.
-3. **Epic 3 — Babel Translation Engine**: auto-translation of posts/AI responses/knowledge-hub content into a parent's preferred language, with a translation-feedback and quality-review loop.
-4. **Epic 4 — Expert Knowledge Hub**: searchable, filterable, bookmarkable clinically-governed guides; each article has an owner/review date/approval status; expired or unapproved content must never be retrievable by Epic 2.
+## Where this diverges from the original PRD
 
-Delivery order per `plan.md`: Epic 1 (foundation) → Epic 4 (governed content backbone) → Epic 2 (core AI experience, needs auth + governed content) → Epic 3 (translation layer, needs content to translate).
+The stakeholder has directed real changes beyond the original BMAD scope; these are now the actual product direction, not the PRD's:
 
-## Hard constraints — do not violate
+- **Multi-child support**: onboarding now collects a *list* of children (not a single child age band), and Home asks which child today's conversation is about.
+- **Expanded onboarding**: parent age, relationship status, and ethnic background are now asked directly in onboarding (still optional), not deferred to a later "personalisation" epic.
+- **Restructured core flow**: rather than a community-feed-first flow, the sequence is now Ask → Response (article + community, with Sentinel) → Satisfaction → Clinician choice, more directly mirroring Epic 2's US-003 through US-008.
+- **Clinician channel choice**: chat *and* video call are both offered (PRD/stories only specified chat/mocked nurse chat).
+- **Local outbreak alerts**: a home-screen alert banner (e.g. "chickenpox rising in your area") — this is **new, not in the original PRD at all**.
+- **Visible language switcher**: language selection is now a first-class Home-screen control, not just a profile field (Epic 3 Babel is still not actually implemented — switching shows a toast, no real translation).
 
-- **Safety fallback discipline**: if AI response generation or risk classification fails or times out, degrade to a safe default (e.g. direct clinician routing) — never a dead-end state.
-- **Content governance boundary**: Epic 2 must never retrieve expired or unapproved Epic 4 content, including as a fallback.
-- **No diagnostic claims**: Kin is not a diagnostic tool and is not a replacement for emergency care.
-- Don't scope-creep toward safety/escalation at the expense of reliability (see PRD §7 counter-metric SM-C1) — a reliable escalation path beats a flashier but fragile build.
+## Design system
 
-## Explicitly out of scope for MVP
+- Tokens live in `src/app/globals.css` as CSS custom properties (`--bg`, `--ink`, `--accent` [community/trust], `--pro` [professional/clinical], `--risk` [Sentinel flag], plus `-soft`/`-ink` variants), redefined for light/dark via `prefers-color-scheme` and `data-theme` overrides. **All text/background pairs are contrast-audited (WCAG AA, ≥4.5:1 for text, ≥3:1 for UI boundaries)** — see the automated axe scan in `e2e/accessibility.spec.ts`. If you change a color token, rerun that suite; a past bug here was checking contrast only against `--surface` and missing the bare `--bg` case used by header/footnote text.
+- Typefaces via `next/font/google` in `src/app/layout.tsx`: Fraunces (display/headings), Manrope (body/UI), IBM Plex Mono (labels/timestamps/eyebrows).
+- `AmbientBackdrop.tsx` is a decorative canvas (subtle drifting motes colored from `--accent`) behind the phone frame — respects `prefers-reduced-motion` (freezes to a static frame).
+- Accessibility patterns already in place: focus moves to the new screen's root on every screen change (`KinPrototype`'s `useEffect` + `tabIndex={-1}` on each screen `<section>`), `role="alert"` on the Intervention Card, `aria-live="polite"` on the nurse chat and response-reply containers, `role="status"` on the toast, `.sr-only` utility for screen-reader-only hints, decorative SVGs marked `aria-hidden`. Hover states on solid-background buttons **darken** (not brighten) — brightening was found (via axe) to drop contrast below AA on `--risk`/`--accent`/`--pro` backgrounds.
 
-- Helen's use case (anonymous posting, teen mental-health content, therapist routing) — long-term vision only, not built.
-- Payments, scheduling, clinician marketplace, real clinician EHR integration.
-- Full regulatory/compliance build-out (see `addendum.md`'s 9–12 month phased rollout for the longer-term view).
-- Enterprise SSO, MFA, account recovery beyond basic reset (Epic 1); real-time voice translation (Epic 3); user-generated knowledge-hub content (Epic 4).
+## Testing
 
-## Build approach (decided, per `addendum.md`)
+Three layers, all passing as of this writing:
 
-Responsive/mobile-first web app (Next.js) on Vercel rather than a native app, with an optional PWA manifest for "Add to Home Screen" installability. Revisit only if a specific requirement demands a native/app-store artifact.
+- **Unit** (`src/lib/__tests__/kinFlow.test.ts`, Vitest): pure data/logic — age→guide mapping, nurse script safety invariants, onboarding option lists, topic/outbreak data shape.
+- **Feature/component** (`src/components/__tests__/*.test.tsx`, Vitest + React Testing Library): every screen in isolation plus a full `KinPrototype.feature.test.tsx` covering the chat path, video path, satisfied-parent path, outbreak alert, multi-child routing, and restart. Screens with internal `setTimeout` sequences use `vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] })` — **use `fireEvent`, not `userEvent`, for clicks under fake timers** (userEvent's internal scheduling hangs indefinitely with Vitest fake timers even with `delay: null`; this was verified directly, not assumed).
+- **Browser/e2e** (`e2e/*.spec.ts`, Playwright against a real production build): `kin-flow.spec.ts` drives the same flows in a real browser; `accessibility.spec.ts` runs axe-core (WCAG 2.1 A/AA) against every screen in both themes. **Accessibility scans force `reducedMotion: "reduce"`** — without it, axe can sample colors mid-CSS-transition during the screen-enter fade and report false-positive contrast failures.
 
-## Open questions blocking build start (see `prd.md` §8 / `plan.md`)
+Run: `npm test` (unit/feature), `npm run test:e2e` (browser + a11y), `npm run build && npm run lint && npx tsc --noEmit` before considering a change done.
 
-1. Which LLM/API powers the AI Parenting Assistant and Sentinel-style risk classification, and is a key available?
-2. Concrete rubric for "low confidence" / "high-risk indicators" driving the clinician-redirect trigger (US-008).
-3. Who authors/reviews the initial Expert Knowledge Hub content set, and by when?
-4. Is the clinician-side handover (US-010) a live handoff, a ticket queue, or scripted/mocked for MVP?
-5. `stories.md` reuses story IDs US-006/007/008 across different epics — renumber before treating IDs as globally unique.
+## Known repo quirk
 
-When starting implementation work, resolve or confirm assumptions on these before writing code that depends on them.
+This directory has a git remote (`origin` → a GitHub repo under the user's account) that Claude did not set up — it appeared mid-session, suggesting parallel work outside this conversation. No commits or pushes have been made from here; confirm before assuming git history in this repo reflects only what's documented above.

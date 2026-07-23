@@ -1,6 +1,12 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
+// Reduced motion collapses the screen-enter fade to ~0ms, so axe never samples
+// colors mid-transition (a real source of false-positive contrast findings).
+test.beforeEach(async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+});
+
 async function completeOnboarding(page: import("@playwright/test").Page) {
   await page.getByPlaceholder("Name (optional)").fill("Liam");
   await page.getByTestId("draft-age-chip-infant").click();
@@ -81,7 +87,7 @@ test.describe("Accessibility (axe, WCAG 2.1 A/AA)", () => {
   });
 
   test("dark theme home screen has no violations", async ({ page }) => {
-    await page.emulateMedia({ colorScheme: "dark" });
+    await page.emulateMedia({ colorScheme: "dark", reducedMotion: "reduce" });
     await page.goto("/");
     await completeOnboarding(page);
     await expectNoViolations(page);

@@ -9,7 +9,7 @@
   --surface-sunken: #F3EEE3;
   --ink: #23262B;
   --ink-soft: #545A61;
-  --ink-faint: #666C73;
+  --ink-faint: #5A6067;
   --line: #867C6B;
 
   --accent: #29594E; /* community / trust */
@@ -84,7 +84,7 @@
   --surface-sunken: #F3EEE3;
   --ink: #23262B;
   --ink-soft: #545A61;
-  --ink-faint: #666C73;
+  --ink-faint: #5A6067;
   --line: #867C6B;
 
   --accent: #29594E;
@@ -412,7 +412,7 @@ p.screen-sub {
   cursor: not-allowed;
 }
 .primary-btn:not(:disabled):hover {
-  filter: brightness(1.06);
+  filter: brightness(0.92);
 }
 
 .screen-footer {
@@ -548,7 +548,7 @@ p.screen-sub {
   cursor: pointer;
 }
 .send-btn:hover {
-  filter: brightness(1.06);
+  filter: brightness(0.92);
 }
 .suggestion-row {
   padding: 0 16px 10px;
@@ -656,7 +656,7 @@ p.screen-sub {
   color: var(--surface);
 }
 .cta-primary:hover {
-  filter: brightness(1.05);
+  filter: brightness(0.92);
 }
 .cta-secondary {
   background: transparent;
