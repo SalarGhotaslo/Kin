@@ -10,6 +10,8 @@ function Harness({ onConnectClinician = vi.fn() }: { onConnectClinician?: (mode:
   const [topic, setTopic] = useState<TopicId | null>(null);
   const [settled, setSettled] = useState(false);
   const [satisfaction, setSatisfaction] = useState<Satisfaction | null>(null);
+  const [responseMode, setResponseMode] = useState<"medical" | "community" | null>(null);
+  const [flowStage, setFlowStage] = useState<"waiting" | "safeReplyShown" | "riskyReplyShown" | "scanning" | "done">("waiting");
 
   return (
     <AskTab
@@ -22,6 +24,8 @@ function Harness({ onConnectClinician = vi.fn() }: { onConnectClinician?: (mode:
         setTopic(t);
         setSettled(false);
         setSatisfaction(null);
+        setResponseMode(null);
+        setFlowStage("waiting");
       }}
       onSettled={() => setSettled(true)}
       onSatisfactionChange={setSatisfaction}
@@ -29,6 +33,10 @@ function Harness({ onConnectClinician = vi.fn() }: { onConnectClinician?: (mode:
       onOpenNotifications={() => {}}
       onConnectClinician={onConnectClinician}
       onShowToast={() => {}}
+      responseMode={responseMode}
+      flowStage={flowStage}
+      onResponseModeChange={setResponseMode}
+      onFlowStageChange={setFlowStage}
     />
   );
 }

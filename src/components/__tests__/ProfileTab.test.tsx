@@ -27,7 +27,7 @@ function setup(overrides: Partial<React.ComponentProps<typeof ProfileTab>> = {})
 describe("ProfileTab", () => {
   it("shows the parent name and a tagline reflecting child count", () => {
     setup({ children_: [createChild("Liam", "infant"), createChild("Maya", "toddler")] });
-    expect(screen.getByText("Alex Johnson")).toBeInTheDocument();
+    expect(screen.getByText("Priya J")).toBeInTheDocument();
     expect(screen.getByText(/parent of 2 children/i)).toBeInTheDocument();
   });
 

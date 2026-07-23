@@ -107,7 +107,7 @@ export default function HomeTab({
                   <path d="M6 4h12v16l-6-4-6 4V4z" />
                 </svg>
               </span>
-              Save
+              Community
             </button>
           </div>
         </section>

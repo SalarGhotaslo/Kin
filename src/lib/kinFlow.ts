@@ -451,6 +451,9 @@ export const CHAT_TIMING = {
 
 export type Satisfaction = "yes" | "partially" | "no";
 
+export type AskResponseMode = "medical" | "community";
+export type AskFlowStage = "waiting" | "safeReplyShown" | "riskyReplyShown" | "scanning" | "done";
+
 export type ClinicianMode = "chat" | "video";
 
 export interface RecommendedClinician {

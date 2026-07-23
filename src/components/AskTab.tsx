@@ -10,6 +10,8 @@ import {
   SENTINEL_TIMING,
   TOPIC_SUGGESTIONS,
   WHY_FLAGGED_DETAIL,
+  type AskFlowStage,
+  type AskResponseMode,
   type ClinicianMode,
   type Satisfaction,
   type TopicId,
@@ -28,9 +30,11 @@ export interface AskTabProps {
   onOpenNotifications: () => void;
   onConnectClinician: (mode: ClinicianMode) => void;
   onShowToast: (text: string) => void;
+  responseMode?: AskResponseMode | null;
+  flowStage?: AskFlowStage;
+  onResponseModeChange?: (mode: AskResponseMode | null) => void;
+  onFlowStageChange?: (stage: AskFlowStage) => void;
 }
-
-type LocalStage = "waiting" | "safeReplyShown" | "riskyReplyShown" | "scanning" | "done";
 
 export default function AskTab({
   question,
@@ -44,39 +48,58 @@ export default function AskTab({
   onOpenNotifications,
   onConnectClinician,
   onShowToast,
+  responseMode,
+  flowStage,
+  onResponseModeChange,
+  onFlowStageChange,
 }: AskTabProps) {
   const [composerValue, setComposerValue] = useState("");
   const [showWhy, setShowWhy] = useState(false);
-  const [localStage, setLocalStage] = useState<LocalStage>(settled ? "done" : "waiting");
-  const [responseMode, setResponseMode] = useState<"medical" | "community" | null>(null);
+  const [localResponseMode, setLocalResponseMode] = useState<AskResponseMode | null>(null);
+  const [localFlowStage, setLocalFlowStage] = useState<AskFlowStage>("waiting");
 
-  // A newly-asked question always starts unsettled; reset the reveal animation
-  // synchronously during render (React's documented pattern for "reset state
-  // when a prop changes") rather than in an effect, which would cascade renders.
+  const resolvedResponseMode = responseMode ?? localResponseMode;
+  const resolvedFlowStage = flowStage ?? localFlowStage;
+  const handleResponseModeChange = (mode: AskResponseMode | null) => {
+    setLocalResponseMode(mode);
+    onResponseModeChange?.(mode);
+  };
+  const handleFlowStageChange = (stage: AskFlowStage) => {
+    setLocalFlowStage(stage);
+    onFlowStageChange?.(stage);
+  };
+
   const [trackedQuestion, setTrackedQuestion] = useState(question);
-  if (question !== trackedQuestion) {
-    setTrackedQuestion(question);
-    setLocalStage(settled ? "done" : "waiting");
-    setShowWhy(false);
-    setResponseMode(null);
-  }
 
   useEffect(() => {
-    if (settled || !question || !topic || responseMode !== "medical") return;
+    if (question === trackedQuestion) return;
+
+    setTrackedQuestion(question);
+    const nextStage = settled ? "done" : "waiting";
+    setShowWhy(false);
+    setLocalResponseMode(null);
+    setLocalFlowStage(nextStage);
+    handleResponseModeChange(null);
+    handleFlowStageChange(nextStage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question, settled, trackedQuestion]);
+
+  useEffect(() => {
+    if (settled || !question || !topic || resolvedResponseMode !== "medical") return;
     const response = AI_RESPONSE_BY_TOPIC[topic];
     if (!response.hasRiskyReply) {
       const t = setTimeout(() => {
-        setLocalStage("done");
+        handleFlowStageChange("done");
         onSettled();
       }, SENTINEL_TIMING.safeReplyAt);
       return () => clearTimeout(t);
     }
     const timers = [
-      setTimeout(() => setLocalStage("safeReplyShown"), SENTINEL_TIMING.safeReplyAt),
-      setTimeout(() => setLocalStage("riskyReplyShown"), SENTINEL_TIMING.riskyReplyRevealAt),
-      setTimeout(() => setLocalStage("scanning"), SENTINEL_TIMING.scanStartAt),
+      setTimeout(() => handleFlowStageChange("safeReplyShown"), SENTINEL_TIMING.safeReplyAt),
+      setTimeout(() => handleFlowStageChange("riskyReplyShown"), SENTINEL_TIMING.riskyReplyRevealAt),
+      setTimeout(() => handleFlowStageChange("scanning"), SENTINEL_TIMING.scanStartAt),
       setTimeout(() => {
-        setLocalStage("done");
+        handleFlowStageChange("done");
         onSettled();
       }, SENTINEL_TIMING.interventionAt),
     ];
@@ -85,12 +108,12 @@ export default function AskTab({
   }, [question, topic, settled, responseMode]);
 
   const response = topic ? AI_RESPONSE_BY_TOPIC[topic] : null;
-  const isMedicalMode = responseMode === "medical";
-  const isCommunityMode = responseMode === "community";
-  const isDone = isCommunityMode ? true : localStage === "done";
-  const showSafeReply = isMedicalMode && localStage !== "waiting";
-  const showRiskyWrap = isMedicalMode && (localStage === "riskyReplyShown" || localStage === "scanning");
-  const isScanning = isMedicalMode && localStage === "scanning";
+  const isMedicalMode = resolvedResponseMode === "medical";
+  const isCommunityMode = resolvedResponseMode === "community";
+  const isDone = isCommunityMode ? true : resolvedFlowStage === "done";
+  const showSafeReply = isMedicalMode && resolvedFlowStage !== "waiting";
+  const showRiskyWrap = isMedicalMode && (resolvedFlowStage === "riskyReplyShown" || resolvedFlowStage === "scanning");
+  const isScanning = isMedicalMode && resolvedFlowStage === "scanning";
   const isFlagged = isMedicalMode && response?.hasRiskyReply && isDone;
 
   const chooseSatisfaction = (choice: Satisfaction) => {
@@ -126,15 +149,15 @@ export default function AskTab({
               {question}
             </p>
 
-            {responseMode === null ? (
+            {resolvedResponseMode === null ? (
               <div className="card" data-testid="response-mode-picker">
                 <span className="field-label">Choose an answer style</span>
                 <p>Start with expert guidance or see how the community is responding.</p>
                 <div className="intervention-actions" style={{ marginTop: 12 }}>
-                  <button type="button" className="btn btn-primary btn-sm" data-testid="response-mode-medical" onClick={() => setResponseMode("medical")}>
+                  <button type="button" className="btn btn-primary btn-sm" data-testid="response-mode-medical" onClick={() => handleResponseModeChange("medical")}>
                     Medical response
                   </button>
-                  <button type="button" className="btn btn-ghost btn-sm" data-testid="response-mode-community" onClick={() => setResponseMode("community")}>
+                  <button type="button" className="btn btn-ghost btn-sm" data-testid="response-mode-community" onClick={() => handleResponseModeChange("community")}>
                     Community response
                   </button>
                 </div>
@@ -156,11 +179,11 @@ export default function AskTab({
                 {isMedicalMode ? <p className="followup-note">{response.followUpNote}</p> : <p className="followup-note">This answer is framed around lived experience and practical support you can try right away.</p>}
                 <div className="intervention-actions" style={{ marginTop: 12 }}>
                   {isMedicalMode ? (
-                    <button type="button" className="btn btn-ghost btn-sm" data-testid="switch-to-community" onClick={() => setResponseMode("community")}>
+                    <button type="button" className="btn btn-ghost btn-sm" data-testid="switch-to-community" onClick={() => handleResponseModeChange("community")}>
                       Try the community response instead
                     </button>
                   ) : (
-                    <button type="button" className="btn btn-ghost btn-sm" data-testid="switch-to-medical" onClick={() => setResponseMode("medical")}>
+                    <button type="button" className="btn btn-ghost btn-sm" data-testid="switch-to-medical" onClick={() => handleResponseModeChange("medical")}>
                       Try the medical response instead
                     </button>
                   )}

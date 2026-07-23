@@ -6,6 +6,8 @@ import {
   DEFAULT_PRIVACY_TOGGLES,
   RECENT_ACTIVITY,
   tabForScreen,
+  type AskFlowStage,
+  type AskResponseMode,
   type Child,
   type ClinicianMode,
   type ParentProfile,
@@ -36,6 +38,8 @@ export default function AppShell() {
   const [askTopic, setAskTopic] = useState<TopicId | null>(null);
   const [askSettled, setAskSettled] = useState(false);
   const [satisfaction, setSatisfaction] = useState<Satisfaction | null>(null);
+  const [askResponseMode, setAskResponseMode] = useState<AskResponseMode | null>(null);
+  const [askFlowStage, setAskFlowStage] = useState<AskFlowStage>("waiting");
 
   const [runId, setRunId] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
@@ -64,6 +68,8 @@ export default function AppShell() {
     setAskTopic(topicId);
     setAskSettled(false);
     setSatisfaction(null);
+    setAskResponseMode(null);
+    setAskFlowStage("waiting");
   };
 
   const restart = () => {
@@ -76,6 +82,8 @@ export default function AppShell() {
     setAskTopic(null);
     setAskSettled(false);
     setSatisfaction(null);
+    setAskResponseMode(null);
+    setAskFlowStage("waiting");
     setToast(null);
     setRunId((id) => id + 1);
   };
@@ -157,6 +165,10 @@ export default function AppShell() {
             onOpenNotifications={() => showToast("No new notifications")}
             onConnectClinician={(mode: ClinicianMode) => setScreen(mode === "chat" ? "clinicianChat" : "clinicianVideo")}
             onShowToast={showToast}
+            responseMode={askResponseMode}
+            flowStage={askFlowStage}
+            onResponseModeChange={setAskResponseMode}
+            onFlowStageChange={setAskFlowStage}
           />
         )}
 
