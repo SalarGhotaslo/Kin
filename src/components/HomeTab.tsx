@@ -1,6 +1,6 @@
 "use client";
 
-import { AGE_OPTIONS, DAILY_INSIGHTS, MILESTONE, OUTBREAK_ALERT, PARENT_USER, RECENT_ACTIVITY, type Child } from "@/lib/kinFlow";
+import { AGE_OPTIONS, DAILY_INSIGHTS, OUTBREAK_ALERT, PARENT_USER, RECENT_ACTIVITY, type Child } from "@/lib/kinFlow";
 import TopBar from "./TopBar";
 
 export interface HomeTabProps {
@@ -25,7 +25,6 @@ export default function HomeTab({
   onContinueChat,
 }: HomeTabProps) {
   const firstName = PARENT_USER.name.split(" ")[0];
-  const milestoneChild = children_[0];
 
   return (
     <section className="app-view" id="screen-home" data-testid="screen-home" tabIndex={-1} aria-label="Home">
@@ -149,31 +148,6 @@ export default function HomeTab({
           </div>
         </section>
 
-        {milestoneChild && (
-          <section>
-            <div className="section-head">
-              <h2>Milestone Tracker</h2>
-            </div>
-            <div className="card" data-testid="milestone-tracker">
-              <p style={{ margin: "0 0 4px", fontSize: "0.85rem" }}>
-                {milestoneChild.name} is {MILESTONE.percentage}% of the way to her {MILESTONE.goalLabel}!
-              </p>
-              <div
-                className="milestone-track"
-                role="progressbar"
-                aria-valuenow={MILESTONE.percentage}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-label={`${milestoneChild.name}'s ${MILESTONE.goalLabel} progress`}
-              >
-                <div className="milestone-fill" style={{ width: `${MILESTONE.percentage}%` }} />
-              </div>
-              <button type="button" className="link-btn" style={{ background: "none", border: "none", color: "var(--primary)", fontWeight: 700, fontSize: "0.8rem", cursor: "pointer", padding: 0 }}>
-                Track progress →
-              </button>
-            </div>
-          </section>
-        )}
       </div>
 
       <button type="button" className="fab" aria-label="Ask Kin AI" data-testid="home-fab" onClick={onAskAi}>

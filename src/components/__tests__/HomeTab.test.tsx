@@ -69,10 +69,4 @@ describe("HomeTab", () => {
     await user.click(screen.getByTestId("home-fab"));
     expect(props.onAskAi).toHaveBeenCalledTimes(1);
   });
-
-  it("shows a milestone tracker for the first child", () => {
-    setup();
-    expect(screen.getByTestId("milestone-tracker")).toHaveTextContent("Liam");
-    expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "85");
-  });
 });
