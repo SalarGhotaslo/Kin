@@ -1,4 +1,4 @@
-export type AgeId = "newborn" | "infant" | "toddler" | "preschool" | "school";
+export type AgeId = "newborn" | "infant" | "toddler" | "preschool" | "school" | "teenager";
 
 /** Internal routing screen. Bottom-nav tabs are derived from this via `tabForScreen`. */
 export type Screen =
@@ -50,6 +50,7 @@ export const AGE_OPTIONS: AgeOption[] = [
   { id: "toddler", label: "Toddler", sub: "1–3 years" },
   { id: "preschool", label: "Preschool", sub: "3–5 years" },
   { id: "school", label: "School-age", sub: "5+ years" },
+  { id: "teenager", label: "Teenager", sub: "13–19 years" },
 ];
 
 /** Broader life-stage groups shown on Profile's "Family Context" — several AgeIds can roll up into one stage. */
@@ -65,6 +66,7 @@ export const STAGE_GROUPS: StageGroup[] = [
   { id: "toddler", label: "Toddler", sub: "1–3 yrs", ages: ["toddler"] },
   { id: "preschool", label: "Preschool", sub: "3–5 yrs", ages: ["preschool"] },
   { id: "school", label: "School Age", sub: "6–12 yrs", ages: ["school"] },
+  { id: "teenager", label: "Teenager", sub: "13–19 yrs", ages: ["teenager"] },
 ];
 
 /** A child added during onboarding. Session-only — nothing here is persisted to an account. */
@@ -168,6 +170,12 @@ export const GUIDE_BY_AGE: Record<AgeId, Guide> = {
     excerpt:
       "Older children can describe symptoms — this guide helps you know which of their words to trust and which still need a clinician's eyes.",
     byline: "Reviewed by Dr. R. Chen, Paediatric Nurse Practitioner · 9 Mar 2026",
+  },
+  teenager: {
+    title: "Fevers in teenagers: when to self-care and when to seek help",
+    excerpt:
+      "Teenagers often manage fevers independently. This guide helps them recognize serious symptoms and know when to reach out to a healthcare provider.",
+    byline: "Reviewed by Dr. A. Osei, Paediatrician · 18 Jul 2026",
   },
 };
 
@@ -464,16 +472,6 @@ export const RECENT_ACTIVITY: RecentActivity = {
   summary: "My 2-year-old is refusing to eat anything but pasta. Kin suggested “Try exposure therapy with small portions of colorful veggies alongside the pasta.”",
   suggestion: "Try exposure therapy with small portions of colorful veggies alongside the pasta.",
   continueTopic: "feeding",
-};
-
-export interface Milestone {
-  goalLabel: string;
-  percentage: number;
-}
-
-export const MILESTONE: Milestone = {
-  goalLabel: "vocabulary goal",
-  percentage: 85,
 };
 
 export interface PrivacyToggles {

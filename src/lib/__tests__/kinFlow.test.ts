@@ -203,6 +203,12 @@ describe("KNOWLEDGE_CATALOG", () => {
       expect(KNOWLEDGE_CATALOG.some((a) => a.topic === topic.id)).toBe(true);
     }
   });
+
+  it("includes richer mock coverage for common parenting topics", () => {
+    expect(KNOWLEDGE_CATALOG.filter((a) => a.topic === "sleep").length).toBeGreaterThanOrEqual(2);
+    expect(KNOWLEDGE_CATALOG.filter((a) => a.topic === "behaviour").length).toBeGreaterThanOrEqual(2);
+    expect(KNOWLEDGE_CATALOG.filter((a) => a.topic === "feeding").length).toBeGreaterThanOrEqual(2);
+  });
 });
 
 describe("OUTBREAK_ALERT", () => {

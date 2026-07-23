@@ -46,8 +46,15 @@ export default function OnboardingScreen({
   return (
     <section className="app-view" id="screen-onboarding" data-testid="screen-onboarding" tabIndex={-1} aria-label="Set up your session">
       <div className="onboarding-header">
-        <span className="top-bar-title"></span>
-        <h1>Kin</h1>
+        <div className="onboarding-hero">
+          <div className="onboarding-icon" aria-hidden="true">
+            ✦
+          </div>
+          <div className="onboarding-copy">
+            <h1>Kin</h1>
+            <p className="onboarding-subtitle">Because parenting takes a community</p>
+          </div>
+        </div>
       </div>
 
       <div className="view-content">
